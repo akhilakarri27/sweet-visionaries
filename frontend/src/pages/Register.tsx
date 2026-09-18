@@ -13,21 +13,32 @@ export const Register: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [successInfo, setSuccessInfo] = useState<{ title: string; message: string } | null>(null);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage('');
+    setSuccessInfo(null);
 
     try {
-      const { error } = await signUp(email.trim(), password, fullName.trim(), phone.trim());
+      const { data, error } = await signUp(email.trim(), password, fullName.trim(), phone.trim());
       if (error) {
-        setErrorMessage(error.message || 'Registration failed');
+        setErrorMessage(error.message || 'Registration failed. Please check your details and try again.');
+      } else if (data?.session) {
+        // Active session created immediately
+        navigate('/account');
+      } else if (data?.user) {
+        // User created, confirmation email sent or ready for sign in
+        setSuccessInfo({
+          title: 'Account Created Successfully! 🎉',
+          message: 'Welcome to Kotaiah Sweets! If email verification is enabled, please check your inbox to confirm, or proceed to sign in.',
+        });
       } else {
         navigate('/account');
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to create account');
+      setErrorMessage(err.message || 'Failed to create account. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +67,23 @@ export const Register: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={handleRegister} className="space-y-4 text-xs">
+        {successInfo ? (
+          <div className="p-6 bg-emerald-50/80 border border-emerald-200 rounded-2xl text-center space-y-4 text-xs">
+            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <h3 className="font-serif font-bold text-base text-emerald-900">{successInfo.title}</h3>
+            <p className="text-emerald-800 leading-relaxed font-sans">{successInfo.message}</p>
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center gap-2 w-full bg-brand-primary hover:bg-brand-primary-hover text-white py-3 rounded-xl font-bold text-xs shadow-primary transition-all"
+            >
+              <span>Proceed to Sign In</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        ) : (
+          <form onSubmit={handleRegister} className="space-y-4 text-xs">
           <div className="space-y-1">
             <label className="font-semibold text-stone-700">Full Name *</label>
             <div className="relative">
@@ -126,6 +153,7 @@ export const Register: React.FC = () => {
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
+        )}
 
         <div className="text-center pt-2 text-xs text-stone-500">
           Already have an account?{' '}

@@ -96,17 +96,19 @@ export const Account: React.FC = () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase.from('profiles').upsert({
-        id: user.id,
-        full_name: fullName,
-        phone: phone,
+      const { error } = await supabase.from('profiles').update({
+        full_name: fullName.trim(),
+        phone: phone ? phone.trim() : null,
         updated_at: new Date().toISOString(),
-      });
+      }).eq('id', user.id);
 
       if (!error) {
         setProfileMsg('Profile updated successfully!');
         await refreshProfile();
         setTimeout(() => setProfileMsg(''), 3000);
+      } else {
+        console.error('Update profile error:', error);
+        setProfileMsg(`Failed to update profile: ${error.message}`);
       }
     } catch (err: any) {
       setProfileMsg('Failed to update profile.');

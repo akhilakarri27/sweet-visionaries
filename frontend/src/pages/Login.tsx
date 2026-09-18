@@ -18,14 +18,14 @@ export const Login: React.FC = () => {
     setErrorMessage('');
 
     try {
-      const { error } = await signIn(email.trim(), password);
+      const { data, error } = await signIn(email.trim(), password);
       if (error) {
-        setErrorMessage(error.message || 'Invalid email or password');
+        setErrorMessage(error.message || 'Invalid email or password. Please try again.');
       } else {
         navigate('/account');
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Login failed');
+      setErrorMessage(err.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
