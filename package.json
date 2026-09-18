@@ -1,0 +1,17 @@
+{
+  "name": "kotaiah-sweets-platform",
+  "version": "1.0.0",
+  "description": "Full-stack E-Commerce & RAG Platform for Kotaiah Sweets with React, Vite, Supabase, and xAI Grok 4.6",
+  "scripts": {
+    "dev": "echo \"To run locally: open two terminals, run 'cd backend && npm run dev' and 'cd frontend && npm run dev'\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "list-models": "cd backend && npm run list-models",
+    "sync-rag": "cd backend && npm run sync-rag"
+  },
+  "keywords": ["ecommerce", "indian-sweets", "supabase", "pgvector", "xai", "grok", "rag"],
+  "author": "Kotaiah Sweets",
+  "license": "MIT"
+}
