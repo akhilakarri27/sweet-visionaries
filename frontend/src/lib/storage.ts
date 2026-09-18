@@ -8,6 +8,9 @@ export const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1599785
 // Default Supabase Storage URL for Hero Video and Poster
 export const DEFAULT_HERO_VIDEO_URL = `${import.meta.env.VITE_SUPABASE_URL || 'https://bunigrqjuvrenwgsodab.supabase.co'}/storage/v1/object/public/hero-videos/kotaiah-sweets-hero.mp4`;
 export const DEFAULT_HERO_POSTER_URL = '/sweets/kakinada-gottam-kaja.jpg';
+export const DEFAULT_HERO_HEADING = 'Kotaiah Sweets';
+export const DEFAULT_HERO_SUBHEADING = 'Traditional Taste, Made for Every Celebration';
+export const DEFAULT_HERO_CTA_TEXT = 'Explore Sweets';
 
 /**
  * Fetch dynamic site configuration from Supabase site_settings table
@@ -34,6 +37,130 @@ export async function getSiteSetting<T>(key: string, defaultValue: T): Promise<T
   } catch (err) {
     console.warn(`Could not load site setting '${key}', using default:`, err);
     return defaultValue;
+  }
+}
+
+/**
+ * Update dynamic site setting in Supabase site_settings table
+ */
+export async function updateSiteSetting(key: string, value: any, description?: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase
+      .from('site_settings')
+      .upsert({
+        key,
+        value: typeof value === 'string' ? value : JSON.stringify(value),
+        description: description || `Configuration for ${key}`,
+        updated_at: new Date().toISOString(),
+      });
+
+    if (error) {
+      console.error(`Error updating site setting ${key}:`, error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to update setting' };
+  }
+}
+
+/**
+ * Upload Hero Video to Supabase Storage
+ */
+export async function uploadHeroVideoFile(file: File): Promise<UploadImageResult> {
+  try {
+    const allowedTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
+    if (!allowedTypes.includes(file.type.toLowerCase()) && !file.name.endsWith('.mp4') && !file.name.endsWith('.webm')) {
+      return {
+        success: false,
+        error: `Invalid video format (${file.type}). Please provide an MP4 or WebM video file.`,
+      };
+    }
+
+    // Limit video size (100MB max)
+    const MAX_VIDEO_SIZE = 100 * 1024 * 1024;
+    if (file.size > MAX_VIDEO_SIZE) {
+      return {
+        success: false,
+        error: `Video is too large (${(file.size / (1024 * 1024)).toFixed(2)}MB). Max size is 100MB.`,
+      };
+    }
+
+    const storagePath = 'kotaiah-sweets-hero.mp4';
+    const { error: uploadError } = await supabase.storage
+      .from(HERO_STORAGE_BUCKET)
+      .upload(storagePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+        contentType: 'video/mp4',
+      });
+
+    if (uploadError) {
+      return { success: false, error: uploadError.message };
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from(HERO_STORAGE_BUCKET)
+      .getPublicUrl(storagePath);
+
+    const publicUrl = publicUrlData.publicUrl;
+
+    // Save to site_settings
+    await updateSiteSetting('hero_video_url', publicUrl, 'Public hero video URL');
+
+    return {
+      success: true,
+      publicUrl,
+      storagePath,
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to upload hero video.' };
+  }
+}
+
+/**
+ * Upload Hero Poster to Supabase Storage
+ */
+export async function uploadHeroPosterFile(file: File): Promise<UploadImageResult> {
+  try {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+      return {
+        success: false,
+        error: `Invalid image type (${file.type}). Please upload a JPG, PNG, or WebP image.`,
+      };
+    }
+
+    const storagePath = 'kotaiah-sweets-poster.jpg';
+    const { error: uploadError } = await supabase.storage
+      .from(HERO_STORAGE_BUCKET)
+      .upload(storagePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+        contentType: 'image/jpeg',
+      });
+
+    if (uploadError) {
+      return { success: false, error: uploadError.message };
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from(HERO_STORAGE_BUCKET)
+      .getPublicUrl(storagePath);
+
+    const publicUrl = publicUrlData.publicUrl;
+
+    // Save to site_settings
+    await updateSiteSetting('hero_poster_url', publicUrl, 'Public hero poster image URL');
+
+    return {
+      success: true,
+      publicUrl,
+      storagePath,
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to upload hero poster.' };
   }
 }
 

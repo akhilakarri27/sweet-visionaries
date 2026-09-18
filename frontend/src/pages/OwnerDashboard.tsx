@@ -19,6 +19,9 @@ import {
   Layers,
   Star,
   Settings,
+  Video,
+  Image as ImageIcon,
+  Check,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -35,7 +38,20 @@ import {
 } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import { supabase, DEFAULT_SHOP_ID, BACKEND_URL } from '../lib/supabase';
-import { getProductImageUrl, uploadProductSweetImage, DEFAULT_FALLBACK_IMAGE } from '../lib/storage';
+import {
+  getProductImageUrl,
+  uploadProductSweetImage,
+  DEFAULT_FALLBACK_IMAGE,
+  getSiteSetting,
+  updateSiteSetting,
+  uploadHeroVideoFile,
+  uploadHeroPosterFile,
+  DEFAULT_HERO_VIDEO_URL,
+  DEFAULT_HERO_POSTER_URL,
+  DEFAULT_HERO_HEADING,
+  DEFAULT_HERO_SUBHEADING,
+  DEFAULT_HERO_CTA_TEXT,
+} from '../lib/storage';
 import { Product, Order, Category, Offer, Review } from '../types/database';
 
 export const OwnerDashboard: React.FC = () => {
@@ -43,7 +59,7 @@ export const OwnerDashboard: React.FC = () => {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'products' | 'categories' | 'orders' | 'reviews' | 'offers' | 'rag'
+    'overview' | 'products' | 'categories' | 'orders' | 'reviews' | 'offers' | 'rag' | 'settings'
   >('overview');
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -52,6 +68,18 @@ export const OwnerDashboard: React.FC = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Site Settings & Hero Control State
+  const [heroVideoUrl, setHeroVideoUrl] = useState('');
+  const [heroPosterUrl, setHeroPosterUrl] = useState('');
+  const [heroHeading, setHeroHeading] = useState('');
+  const [heroSubheading, setHeroSubheading] = useState('');
+  const [heroCtaText, setHeroCtaText] = useState('');
+  const [uploadingHeroVideo, setUploadingHeroVideo] = useState(false);
+  const [uploadingHeroPoster, setUploadingHeroPoster] = useState(false);
+  const [heroSettingsSaved, setHeroSettingsSaved] = useState(false);
+  const [heroSettingsError, setHeroSettingsError] = useState<string | null>(null);
+  const [savingHeroSettings, setSavingHeroSettings] = useState(false);
 
   // New Product Modal State
   const [showProductModal, setShowProductModal] = useState(false);
@@ -118,6 +146,20 @@ export const OwnerDashboard: React.FC = () => {
         .eq('shop_id', DEFAULT_SHOP_ID)
         .order('created_at', { ascending: false });
       if (revData) setReviews(revData as Review[]);
+
+      // Site Settings (Hero Video & Branding)
+      const [vUrl, pUrl, heading, subhead, cta] = await Promise.all([
+        getSiteSetting('hero_video_url', DEFAULT_HERO_VIDEO_URL),
+        getSiteSetting('hero_poster_url', DEFAULT_HERO_POSTER_URL),
+        getSiteSetting('hero_heading', DEFAULT_HERO_HEADING),
+        getSiteSetting('hero_subheading', DEFAULT_HERO_SUBHEADING),
+        getSiteSetting('hero_cta_text', DEFAULT_HERO_CTA_TEXT),
+      ]);
+      setHeroVideoUrl(vUrl);
+      setHeroPosterUrl(pUrl);
+      setHeroHeading(heading);
+      setHeroSubheading(subhead);
+      setHeroCtaText(cta);
     } catch (err) {
       console.error('Owner dashboard data error:', err);
     } finally {
@@ -357,6 +399,80 @@ export const OwnerDashboard: React.FC = () => {
     }
   };
 
+  // Save Hero & Site Settings
+  const handleSaveHeroSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingHeroSettings(true);
+    setHeroSettingsError(null);
+    setHeroSettingsSaved(false);
+
+    try {
+      await Promise.all([
+        updateSiteSetting('hero_video_url', heroVideoUrl, 'Homepage hero video URL'),
+        updateSiteSetting('hero_poster_url', heroPosterUrl, 'Homepage hero poster image URL'),
+        updateSiteSetting('hero_heading', heroHeading, 'Homepage hero main heading'),
+        updateSiteSetting('hero_subheading', heroSubheading, 'Homepage hero subheading'),
+        updateSiteSetting('hero_cta_text', heroCtaText, 'Homepage hero CTA button text'),
+      ]);
+
+      setHeroSettingsSaved(true);
+      setTimeout(() => setHeroSettingsSaved(false), 4000);
+    } catch (err: any) {
+      console.error('Error saving site settings:', err);
+      setHeroSettingsError(err.message || 'Failed to save site settings.');
+    } finally {
+      setSavingHeroSettings(false);
+    }
+  };
+
+  // Upload Hero Video File directly to Supabase Storage hero-videos bucket
+  const handleHeroVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingHeroVideo(true);
+    setHeroSettingsError(null);
+
+    try {
+      const res = await uploadHeroVideoFile(file);
+      if (!res.success || !res.publicUrl) {
+        throw new Error(res.error || 'Failed to upload hero video to Supabase Storage.');
+      }
+      setHeroVideoUrl(res.publicUrl);
+      setHeroSettingsSaved(true);
+      setTimeout(() => setHeroSettingsSaved(false), 4000);
+    } catch (err: any) {
+      console.error('Hero video upload error:', err);
+      setHeroSettingsError(err.message || 'Video upload failed.');
+    } finally {
+      setUploadingHeroVideo(false);
+    }
+  };
+
+  // Upload Hero Poster File directly to Supabase Storage hero-videos bucket
+  const handleHeroPosterUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingHeroPoster(true);
+    setHeroSettingsError(null);
+
+    try {
+      const res = await uploadHeroPosterFile(file);
+      if (!res.success || !res.publicUrl) {
+        throw new Error(res.error || 'Failed to upload poster image to Supabase Storage.');
+      }
+      setHeroPosterUrl(res.publicUrl);
+      setHeroSettingsSaved(true);
+      setTimeout(() => setHeroSettingsSaved(false), 4000);
+    } catch (err: any) {
+      console.error('Hero poster upload error:', err);
+      setHeroSettingsError(err.message || 'Poster upload failed.');
+    } finally {
+      setUploadingHeroPoster(false);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       
@@ -414,6 +530,7 @@ export const OwnerDashboard: React.FC = () => {
           { key: 'reviews', label: `Reviews (${reviews.length})`, icon: Star },
           { key: 'offers', label: `Offers (${offers.length})`, icon: Gift },
           { key: 'rag', label: 'pgvector RAG Status', icon: Sparkles },
+          { key: 'settings', label: 'Hero Video & Settings', icon: Settings },
         ].map((t) => {
           const Icon = t.icon;
           const isActive = activeTab === t.key;
@@ -699,6 +816,247 @@ export const OwnerDashboard: React.FC = () => {
               <div className="font-serif font-bold text-xs text-brand-maroon mt-1">xAI Grok 4.6 (Grounded)</div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* TAB: HERO VIDEO & SITE SETTINGS */}
+      {activeTab === 'settings' && (
+        <div className="bg-[#FFFDF9] rounded-3xl border border-brand-border p-6 sm:p-8 shadow-soft space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-brand-border pb-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-gold uppercase tracking-wider font-serif">
+                <Settings className="w-3.5 h-3.5" />
+                <span>Site Configuration</span>
+              </div>
+              <h2 className="font-serif font-bold text-2xl text-brand-charcoal">
+                Homepage Hero Video & Brand Settings
+              </h2>
+              <p className="text-xs text-stone-500">
+                Update the hero video, fallback poster image, headline, subheading, and CTA text without code changes.
+              </p>
+            </div>
+
+            <button
+              onClick={handleSaveHeroSettings}
+              disabled={savingHeroSettings}
+              className="flex items-center gap-2 bg-gradient-to-r from-brand-maroon to-brand-maroon-dark text-brand-gold-light px-6 py-3 rounded-2xl font-bold text-xs shadow-soft hover:scale-105 transition-all disabled:opacity-50"
+            >
+              {savingHeroSettings ? (
+                <RefreshCw className="w-4 h-4 animate-spin text-brand-gold" />
+              ) : (
+                <Check className="w-4 h-4 text-brand-gold" />
+              )}
+              <span>{savingHeroSettings ? 'Saving Settings...' : 'Save Site Settings'}</span>
+            </button>
+          </div>
+
+          {/* Status Messages */}
+          {heroSettingsSaved && (
+            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-800 font-semibold flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Hero and brand settings successfully saved to Supabase site_settings table!</span>
+            </div>
+          )}
+
+          {heroSettingsError && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-700 font-semibold flex items-center gap-2">
+              <XCircle className="w-4 h-4 text-red-600 shrink-0" />
+              <span>{heroSettingsError}</span>
+            </div>
+          )}
+
+          {/* Live Preview Cards Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* Live Hero Video Preview */}
+            <div className="lg:col-span-7 space-y-3">
+              <span className="text-xs font-bold text-stone-700 font-serif block">
+                Live Hero Video Preview (Supabase Storage Bucket: <code className="font-mono text-brand-gold-dark">hero-videos</code>)
+              </span>
+              <div className="relative aspect-video rounded-2xl overflow-hidden bg-black border-2 border-brand-border/90 shadow-soft">
+                {heroVideoUrl ? (
+                  <video
+                    src={heroVideoUrl}
+                    poster={heroPosterUrl || DEFAULT_HERO_POSTER_URL}
+                    controls
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-stone-400 text-xs p-4 text-center">
+                    <Video className="w-8 h-8 text-stone-500 mb-2" />
+                    <span>No Hero Video Configured</span>
+                  </div>
+                )}
+                <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-xs text-white text-[10px] font-mono px-2 py-0.5 rounded border border-white/20">
+                  Storage Key: hero-videos/kotaiah-sweets-hero.mp4
+                </div>
+              </div>
+            </div>
+
+            {/* Live Poster Image Preview */}
+            <div className="lg:col-span-5 space-y-3">
+              <span className="text-xs font-bold text-stone-700 font-serif block">
+                Hero Poster Fallback Preview (Reduced Motion & Mobile)
+              </span>
+              <div className="relative aspect-video rounded-2xl overflow-hidden bg-brand-surface border-2 border-brand-border/90 shadow-soft flex items-center justify-center">
+                {heroPosterUrl ? (
+                  <img
+                    src={heroPosterUrl}
+                    alt="Hero Poster Preview"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = DEFAULT_FALLBACK_IMAGE;
+                    }}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-stone-400 text-xs flex flex-col items-center gap-1">
+                    <ImageIcon className="w-6 h-6 text-stone-400" />
+                    <span>Default fallback poster active</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+          </div>
+
+          {/* Hero Form Controls */}
+          <form onSubmit={handleSaveHeroSettings} className="space-y-6 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-stone-700 font-serif">Hero Main Heading *</label>
+                <input
+                  type="text"
+                  required
+                  value={heroHeading}
+                  onChange={(e) => setHeroHeading(e.target.value)}
+                  placeholder="e.g. Kotaiah Sweets"
+                  className="w-full bg-brand-surface p-3 rounded-xl border border-brand-border text-xs focus:outline-none focus:border-brand-gold"
+                />
+              </div>
+
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-xs font-bold text-stone-700 font-serif">Hero Subheading *</label>
+                <input
+                  type="text"
+                  required
+                  value={heroSubheading}
+                  onChange={(e) => setHeroSubheading(e.target.value)}
+                  placeholder="e.g. Traditional Taste, Made for Every Celebration"
+                  className="w-full bg-brand-surface p-3 rounded-xl border border-brand-border text-xs focus:outline-none focus:border-brand-gold"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-stone-700 font-serif">Hero CTA Button Text *</label>
+                <input
+                  type="text"
+                  required
+                  value={heroCtaText}
+                  onChange={(e) => setHeroCtaText(e.target.value)}
+                  placeholder="e.g. Explore Sweets"
+                  className="w-full bg-brand-surface p-3 rounded-xl border border-brand-border text-xs focus:outline-none focus:border-brand-gold"
+                />
+              </div>
+
+            </div>
+
+            {/* Upload Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-brand-border/60">
+              
+              {/* Video Upload / URL */}
+              <div className="bg-brand-surface p-5 rounded-2xl border border-brand-border space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-brand-charcoal flex items-center gap-1.5">
+                    <Video className="w-4 h-4 text-brand-gold" />
+                    <span>Hero Video (MP4 / WebM)</span>
+                  </span>
+                  {uploadingHeroVideo && (
+                    <span className="text-[10px] text-brand-maroon font-bold animate-pulse">Uploading to Supabase...</span>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block w-full bg-[#FFFDF9] border-2 border-dashed border-brand-border hover:border-brand-gold py-3 px-4 rounded-xl font-bold text-xs text-stone-700 hover:text-brand-maroon cursor-pointer text-center transition-all">
+                    <Upload className="w-4 h-4 mx-auto mb-1 text-brand-gold" />
+                    <span>{uploadingHeroVideo ? 'Uploading Video...' : 'Upload Video File to Supabase Storage'}</span>
+                    <span className="block text-[10px] text-stone-400 font-normal mt-0.5">Max 100MB • Saved to hero-videos/kotaiah-sweets-hero.mp4</span>
+                    <input
+                      type="file"
+                      accept="video/mp4,video/webm"
+                      disabled={uploadingHeroVideo}
+                      onChange={handleHeroVideoUpload}
+                      className="hidden"
+                    />
+                  </label>
+
+                  <div>
+                    <label className="text-[11px] text-stone-500 font-medium block mb-1">Direct Video URL</label>
+                    <input
+                      type="text"
+                      value={heroVideoUrl}
+                      onChange={(e) => setHeroVideoUrl(e.target.value)}
+                      placeholder="https://...supabase.co/storage/v1/object/public/hero-videos/kotaiah-sweets-hero.mp4"
+                      className="w-full bg-[#FFFDF9] p-2.5 rounded-xl border border-brand-border text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Poster Upload / URL */}
+              <div className="bg-brand-surface p-5 rounded-2xl border border-brand-border space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-brand-charcoal flex items-center gap-1.5">
+                    <ImageIcon className="w-4 h-4 text-brand-gold" />
+                    <span>Hero Poster Image (JPG / PNG)</span>
+                  </span>
+                  {uploadingHeroPoster && (
+                    <span className="text-[10px] text-brand-maroon font-bold animate-pulse">Uploading to Supabase...</span>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block w-full bg-[#FFFDF9] border-2 border-dashed border-brand-border hover:border-brand-gold py-3 px-4 rounded-xl font-bold text-xs text-stone-700 hover:text-brand-maroon cursor-pointer text-center transition-all">
+                    <Upload className="w-4 h-4 mx-auto mb-1 text-brand-gold" />
+                    <span>{uploadingHeroPoster ? 'Uploading Poster...' : 'Upload Poster Image to Supabase Storage'}</span>
+                    <span className="block text-[10px] text-stone-400 font-normal mt-0.5">Saved to hero-videos/kotaiah-sweets-poster.jpg</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      disabled={uploadingHeroPoster}
+                      onChange={handleHeroPosterUpload}
+                      className="hidden"
+                    />
+                  </label>
+
+                  <div>
+                    <label className="text-[11px] text-stone-500 font-medium block mb-1">Direct Poster URL</label>
+                    <input
+                      type="text"
+                      value={heroPosterUrl}
+                      onChange={(e) => setHeroPosterUrl(e.target.value)}
+                      placeholder="/sweets/kakinada-gottam-kaja.jpg"
+                      className="w-full bg-[#FFFDF9] p-2.5 rounded-xl border border-brand-border text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div className="flex justify-end pt-4 border-t border-brand-border">
+              <button
+                type="submit"
+                disabled={savingHeroSettings}
+                className="bg-gradient-to-r from-brand-maroon to-brand-maroon-dark text-brand-gold-light px-8 py-3 rounded-2xl font-bold text-xs shadow-soft hover:bg-brand-gold transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                {savingHeroSettings ? <RefreshCw className="w-4 h-4 animate-spin text-brand-gold" /> : <Check className="w-4 h-4 text-brand-gold" />}
+                <span>Save All Site Settings</span>
+              </button>
+            </div>
+          </form>
         </div>
       )}
 

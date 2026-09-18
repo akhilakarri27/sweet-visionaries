@@ -51,9 +51,12 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
 
-  // Hero Video & Poster URLs loaded from Supabase site_settings
+  // Hero Settings loaded from Supabase site_settings
   const [heroVideoUrl, setHeroVideoUrl] = useState<string>(DEFAULT_HERO_VIDEO_URL);
   const [heroPosterUrl, setHeroPosterUrl] = useState<string>(DEFAULT_HERO_POSTER_URL);
+  const [heroHeading, setHeroHeading] = useState<string>('Kotaiah Sweets');
+  const [heroSubheading, setHeroSubheading] = useState<string>('Traditional Taste, Made for Every Celebration');
+  const [heroCtaText, setHeroCtaText] = useState<string>('Explore Sweets');
   
   // Quick View Modal State
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
@@ -69,12 +72,18 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
     const loadHomeData = async () => {
       try {
         // 1. Fetch Dynamic Hero Video & Poster Settings
-        const [videoSetting, posterSetting] = await Promise.all([
+        const [videoSetting, posterSetting, headingSetting, subheadingSetting, ctaSetting] = await Promise.all([
           getSiteSetting<string>('hero_video_url', DEFAULT_HERO_VIDEO_URL),
           getSiteSetting<string>('hero_poster_url', DEFAULT_HERO_POSTER_URL),
+          getSiteSetting<string>('hero_heading', 'Kotaiah Sweets'),
+          getSiteSetting<string>('hero_subheading', 'Traditional Taste, Made for Every Celebration'),
+          getSiteSetting<string>('hero_cta_text', 'Explore Sweets'),
         ]);
         if (videoSetting) setHeroVideoUrl(videoSetting);
         if (posterSetting) setHeroPosterUrl(posterSetting);
+        if (headingSetting) setHeroHeading(headingSetting);
+        if (subheadingSetting) setHeroSubheading(subheadingSetting);
+        if (ctaSetting) setHeroCtaText(ctaSetting);
 
         const { data: cats } = await supabase
           .from('categories')
@@ -110,6 +119,9 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
 
     loadHomeData();
   }, []);
+
+  // Featured Sweets (is_featured === true)
+  const featuredProducts = allProducts.filter((p) => p.is_featured).slice(0, 8);
 
   // Filtered Sweets according to selected tab
   const displayedProducts = selectedCategoryTab === 'all'
@@ -159,10 +171,10 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
   return (
     <div className="space-y-16 sm:space-y-24">
       
-      {/* 1. FULL-WIDTH HERO VIDEO SECTION */}
+      {/* 1. HERO VIDEO SECTION */}
       <section className="relative w-full min-h-[85vh] lg:min-h-[92vh] flex items-center justify-center overflow-hidden bg-stone-950 border-b border-brand-gold/30">
         
-        {/* Full-width Background Video */}
+        {/* Background Video Player */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <video
             key={heroVideoUrl}
@@ -170,28 +182,30 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
             muted
             loop
             playsInline
+            preload="metadata"
             poster={heroPosterUrl}
-            className="absolute inset-0 w-full h-full object-cover object-center scale-[1.02] transform transition-transform duration-1000"
+            className="hero-bg-video absolute inset-0 w-full h-full object-cover object-center scale-[1.02] transform transition-transform duration-1000"
+            aria-hidden="true"
           >
             <source src={heroVideoUrl} type="video/mp4" />
-            {/* Fallback image if video cannot be played */}
-            <img
-              src={heroPosterUrl}
-              alt="Kotaiah Sweets Traditional Delicacies"
-              className="w-full h-full object-cover"
-            />
           </video>
+
+          {/* Reduced-motion & loading poster fallback */}
+          <img
+            src={heroPosterUrl}
+            alt="Kotaiah Sweets Authentic Delicacies"
+            className="hero-poster-fallback hidden absolute inset-0 w-full h-full object-cover object-center"
+          />
         </div>
 
-        {/* Subtle Warm Vignette Overlay - Keeps video clear while giving text high readability */}
+        {/* Subtle Warm Overlay for readability without dimming the sweets */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/60 pointer-events-none" />
-        <div className="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-black/50 pointer-events-none" />
 
         {/* Hero Content Area */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center space-y-7">
           
           {/* Heritage Pill Badge */}
-          <div className="inline-flex items-center gap-2 bg-brand-maroon/85 border border-brand-gold/60 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-brand-gold-light shadow-gold">
+          <div className="inline-flex items-center gap-2 bg-brand-maroon/90 border border-brand-gold/60 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-brand-gold-light shadow-gold">
             <Sparkles className="w-4 h-4 text-brand-gold animate-spin-slow" />
             <span>Master Artisans of Authentic Andhra Sweets • Since 1900</span>
           </div>
@@ -199,10 +213,10 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
           {/* Headline and Tagline */}
           <div className="space-y-3">
             <h1 className="font-serif font-black text-4xl sm:text-6xl lg:text-7xl text-[#FFFDF9] tracking-tight leading-[1.1] drop-shadow-lg">
-              Kotaiah Sweets
+              {heroHeading}
             </h1>
             <p className="font-serif italic text-lg sm:text-2xl lg:text-3xl text-brand-gold-light drop-shadow font-medium">
-              "Traditional Taste, Made for Every Celebration"
+              "{heroSubheading}"
             </p>
           </div>
 
@@ -217,7 +231,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
               href="#menu"
               className="flex items-center gap-2 bg-gradient-to-r from-brand-gold to-amber-500 hover:from-amber-500 hover:to-brand-gold text-stone-950 px-8 py-4 rounded-full font-black text-sm tracking-wide shadow-gold hover:scale-105 hover:shadow-float transition-all cursor-pointer"
             >
-              <span>Explore Sweets</span>
+              <span>{heroCtaText}</span>
               <ArrowRight className="w-4 h-4" />
             </a>
 
@@ -263,7 +277,201 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
         </div>
       </section>
 
-      {/* 2. COMPLETE SWEETS MENU & CATEGORIES (ALL IN ONE) */}
+      {/* 2. FEATURED SWEETS (SIGNATURE COLLECTION) */}
+      <section id="featured" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 border-b border-brand-border/80 pb-4">
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-gold uppercase tracking-wider font-serif">
+              <Award className="w-4 h-4 text-brand-gold" />
+              <span>Kotaiah's Signature Heritage</span>
+            </div>
+            <h2 className="font-serif font-black text-3xl sm:text-4xl text-brand-charcoal">
+              Featured Signature Sweets
+            </h2>
+            <p className="text-xs sm:text-sm text-stone-600 font-sans">
+              Handpicked customer favourites crafted fresh with pure country cow ghee and generational recipes.
+            </p>
+          </div>
+
+          <Link
+            to="/products"
+            className="flex items-center gap-1.5 text-xs font-bold text-brand-maroon hover:text-brand-gold transition-colors bg-brand-surface px-4 py-2 rounded-full border border-brand-border"
+          >
+            <span>View All ({allProducts.length}) Sweets</span>
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* Featured Sweets Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {featuredProducts.map((product) => {
+            const primaryImg = getProductImageUrl(product);
+            return (
+              <div
+                key={product.id}
+                className="group bg-[#FFFDF9] rounded-2xl border border-brand-border/90 p-4 shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 relative"
+              >
+                <div>
+                  {/* Badge */}
+                  <span className="absolute top-6 left-6 z-10 bg-brand-maroon text-brand-gold-light text-[9px] font-black uppercase px-2.5 py-1 rounded-full shadow-soft">
+                    ⭐ Featured
+                  </span>
+
+                  {/* Image Container */}
+                  <div className="relative w-full h-48 rounded-xl overflow-hidden bg-brand-surface mb-3">
+                    <img
+                      src={primaryImg}
+                      alt={product.name}
+                      loading="lazy"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = DEFAULT_FALLBACK_IMAGE;
+                      }}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 cursor-pointer"
+                      onClick={() => {
+                        setQuickViewProduct(product);
+                        setModalWeight(product.weight || '500g');
+                        setModalQuantity(1);
+                      }}
+                    />
+
+                    {/* Quick View Button */}
+                    <button
+                      onClick={() => {
+                        setQuickViewProduct(product);
+                        setModalWeight(product.weight || '500g');
+                        setModalQuantity(1);
+                      }}
+                      className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-xs font-bold backdrop-blur-xs"
+                    >
+                      <Eye className="w-4 h-4" />
+                      <span>Quick View & Order</span>
+                    </button>
+
+                    {/* Wishlist toggle */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleWishlist(product);
+                      }}
+                      className={`absolute top-2 right-2 p-2 rounded-full transition-all ${
+                        isInWishlist(product.id)
+                          ? 'bg-rose-50 text-rose-600 shadow-sm'
+                          : 'bg-white/80 text-stone-600 hover:text-rose-600'
+                      }`}
+                      title="Add to Wishlist"
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
+                    </button>
+                  </div>
+
+                  {/* Category & Rating */}
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="text-brand-gold font-semibold uppercase tracking-wider text-[10px]">
+                      {product.categories?.name || 'Traditional Delicacy'}
+                    </span>
+                    <div className="flex items-center gap-0.5 text-amber-600 text-xs font-bold">
+                      <Star className="w-3 h-3 fill-current" />
+                      <span>{Number(product.rating || 5.0).toFixed(1)}</span>
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <h3
+                    onClick={() => {
+                      setQuickViewProduct(product);
+                      setModalWeight(product.weight || '500g');
+                      setModalQuantity(1);
+                    }}
+                    className="font-serif font-bold text-sm text-brand-charcoal line-clamp-1 hover:text-brand-gold cursor-pointer"
+                  >
+                    {product.name}
+                  </h3>
+
+                  <p className="text-[11px] text-stone-500 mt-1 line-clamp-2 leading-relaxed">
+                    {product.description}
+                  </p>
+                </div>
+
+                {/* Price & Action */}
+                <div className="mt-4 pt-3 border-t border-brand-border/60 flex items-center justify-between">
+                  <div>
+                    <span className="text-xs text-stone-500 mr-1">Price:</span>
+                    <span className="font-serif font-black text-base text-brand-maroon">
+                      ₹{product.price}
+                    </span>
+                    <span className="text-[10px] text-stone-400 block">for {product.weight || '500g'}</span>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setQuickViewProduct(product);
+                      setModalWeight(product.weight || '500g');
+                      setModalQuantity(1);
+                    }}
+                    className="flex items-center gap-1 bg-brand-maroon text-brand-gold-light text-xs font-bold px-3 py-2 rounded-xl hover:bg-brand-gold hover:text-white transition-colors"
+                  >
+                    <span>View & Order</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 3. CATEGORIES SECTION */}
+      <section id="categories" className="bg-brand-surface/60 py-16 border-y border-brand-border/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <span className="text-xs font-bold text-brand-gold uppercase tracking-wider font-serif">
+              Authentic Variety
+            </span>
+            <h2 className="font-serif font-black text-3xl sm:text-4xl text-brand-charcoal">
+              Explore By Sweet Categories
+            </h2>
+            <p className="text-xs sm:text-sm text-stone-600 font-sans">
+              Discover authentic Andhra culinary delicacies prepared with time-honored traditional protocols.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+            {categories.map((cat) => {
+              const count = allProducts.filter((p) => p.category_id === cat.id).length;
+              return (
+                <Link
+                  key={cat.id}
+                  to={`/products?category=${cat.id}`}
+                  className="group bg-[#FFFDF9] rounded-2xl border border-brand-border/80 overflow-hidden shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 text-center"
+                >
+                  <div className="relative w-full h-32 overflow-hidden bg-brand-surface">
+                    <img
+                      src={cat.image_url || DEFAULT_FALLBACK_IMAGE}
+                      alt={cat.name}
+                      className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                  </div>
+
+                  <div className="p-3.5 space-y-1">
+                    <h3 className="font-serif font-bold text-sm text-brand-charcoal group-hover:text-brand-gold transition-colors line-clamp-1">
+                      {cat.name}
+                    </h3>
+                    <p className="text-[10px] text-stone-500 line-clamp-1">
+                      {cat.description || 'Authentic traditional recipe'}
+                    </p>
+                    <span className="inline-block text-[10px] font-bold text-brand-maroon bg-brand-cream px-2 py-0.5 rounded-full mt-1">
+                      {count > 0 ? `${count} Delicacies` : 'Browse Menu'}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. POPULAR & BESTSELLER PRODUCTS (FULL CATALOGUE WITH TABS) */}
       <section id="menu" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center max-w-3xl mx-auto space-y-2">
           <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-gold uppercase tracking-wider">
@@ -271,14 +479,14 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
             <span>Complete Traditional Sweets Menu</span>
           </div>
           <h2 className="font-serif font-black text-3xl sm:text-4xl text-brand-charcoal">
-            Explore All Authentic Sweets & Savouries
+            Popular & Bestseller Sweets
           </h2>
           <p className="text-xs sm:text-sm text-stone-600 font-sans">
             Choose your favorites below. Click on any item for full ingredients, taste profile, weight options, and instant order.
           </p>
         </div>
 
-        {/* Category Tabs */}
+        {/* Category Filter Tabs */}
         <div className="flex items-center justify-center gap-2 overflow-x-auto pb-2 scrollbar-none flex-wrap">
           {[
             { key: 'all', label: `All Sweets (${allProducts.length})` },
@@ -417,101 +625,126 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
         </div>
       </section>
 
-      {/* 3. SPECIAL OFFERS SECTION */}
-      <section id="offers" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-brand-maroon via-brand-maroon-dark to-stone-900 rounded-3xl p-6 sm:p-10 border-2 border-brand-gold/50 shadow-float text-[#FFFDF9] relative overflow-hidden">
-          <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-7 space-y-3">
-              <div className="inline-flex items-center gap-1.5 bg-brand-gold/20 text-brand-gold-light border border-brand-gold/40 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                <Gift className="w-3.5 h-3.5" />
-                <span>Festive Celebration Promo</span>
-              </div>
-              <h3 className="font-serif font-black text-2xl sm:text-4xl text-[#FFFDF9] leading-tight">
-                Use Coupon Codes For Instant Discounts!
-              </h3>
-              <p className="text-xs sm:text-sm text-stone-300 max-w-xl">
-                Apply coupon code <code className="bg-black/50 px-2 py-0.5 rounded text-brand-gold-light font-mono font-bold">FESTIVE15</code> for 15% off orders over ₹999, or <code className="bg-black/50 px-2 py-0.5 rounded text-brand-gold-light font-mono font-bold">WELCOME10</code> for 10% off your first order.
-              </p>
+      {/* 5. ABOUT / BRAND HERITAGE SECTION */}
+      <section id="about" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center bg-[#FFFDF9] rounded-3xl border border-brand-border p-6 sm:p-10 shadow-soft">
+          
+          <div className="lg:col-span-7 space-y-4">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-gold uppercase tracking-wider font-serif">
+              <Sparkles className="w-4 h-4 text-brand-gold" />
+              <span>Generations of Master Craftsmanship</span>
             </div>
+            <h2 className="font-serif font-black text-3xl sm:text-4xl text-brand-charcoal leading-tight">
+              About Kotaiah Sweets
+            </h2>
+            <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-sans">
+              Founded in <strong>1900 in Kakinada, Andhra Pradesh</strong>, Kotaiah Sweets is the home of the world-famous <strong>Kakinada Gottam Kaja</strong>. For over a century, our master confectionery artisans have preserved the authentic taste, layered crunch, and warm cardamom syrup infusion that has delighted generations of sweet lovers across India.
+            </p>
+            <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-sans">
+              Every preparation strictly uses 100% pure desi cow ghee, freshly ground spices, and traditional brass and copper vessels to achieve the genuine aroma and velvety richness celebrated in every festive moment.
+            </p>
 
-            <div className="lg:col-span-5 flex flex-col gap-2.5">
-              {[
-                { code: 'FESTIVE15', title: '15% Off All Sweets', min: '₹999' },
-                { code: 'KAJA50', title: '10% Off Gottam & Nethi Kaja', min: '₹499' },
-                { code: 'WELCOME10', title: '10% Welcome Discount', min: '₹300' },
-              ].map((c) => (
-                <div key={c.code} className="bg-white/10 backdrop-blur-md border border-brand-gold/30 rounded-2xl p-3 flex items-center justify-between">
-                  <div>
-                    <span className="font-mono font-black text-xs text-brand-gold-light bg-black/40 px-2 py-0.5 rounded border border-brand-gold/40">
-                      {c.code}
-                    </span>
-                    <h4 className="font-serif font-bold text-xs text-[#FFFDF9] mt-0.5">{c.title}</h4>
-                  </div>
-                  <span className="text-[10px] text-stone-300">Min. {c.min}</span>
-                </div>
-              ))}
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-brand-border/60 text-center sm:text-left">
+              <div>
+                <div className="font-serif font-black text-2xl text-brand-maroon">1900</div>
+                <div className="text-[11px] text-stone-500 font-medium">Established in Kakinada</div>
+              </div>
+              <div>
+                <div className="font-serif font-black text-2xl text-brand-maroon">100%</div>
+                <div className="text-[11px] text-stone-500 font-medium">Pure Desi Cow Ghee</div>
+              </div>
+              <div>
+                <div className="font-serif font-black text-2xl text-brand-maroon">43+</div>
+                <div className="text-[11px] text-stone-500 font-medium">Traditional Sweets</div>
+              </div>
             </div>
           </div>
+
+          <div className="lg:col-span-5 relative">
+            <div className="rounded-2xl overflow-hidden border-2 border-brand-gold/40 shadow-card bg-brand-surface">
+              <img
+                src="/sweets/kakinada-gottam-kaja.jpg"
+                alt="Traditional Kakinada Gottam Kaja"
+                className="w-full h-72 object-cover object-center"
+              />
+              <div className="p-4 bg-brand-surface border-t border-brand-border">
+                <span className="text-[10px] font-bold text-brand-gold-dark uppercase tracking-wider block">Signature Creation</span>
+                <h4 className="font-serif font-bold text-sm text-brand-charcoal">Original Kakinada Gottam Kaja</h4>
+                <p className="text-[11px] text-stone-500">Crispy exterior with luscious cardamom syrup center.</p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
-      {/* 4. WHY CHOOSE KOTAIAH SWEETS */}
-      <section id="about" className="bg-brand-cream/50 py-16 border-y border-brand-border">
+      {/* 6. WHY CHOOSE US */}
+      <section id="why-choose-us" className="bg-brand-cream/50 py-16 border-y border-brand-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
             <span className="text-xs font-bold text-brand-gold uppercase tracking-wider font-serif">
               Artisanal Commitment
             </span>
-            <h2 className="font-serif font-black text-2xl sm:text-3xl text-brand-charcoal mt-1">
-              Why Kotaiah Sweets Stands Apart
+            <h2 className="font-serif font-black text-3xl text-brand-charcoal">
+              Why Choose Kotaiah Sweets
             </h2>
-            <p className="text-xs sm:text-sm text-stone-600 mt-2 font-sans">
-              Every single batch is crafted following traditional culinary protocols to preserve generational purity and authentic taste.
+            <p className="text-xs sm:text-sm text-stone-600 font-sans">
+              Every batch is crafted following traditional confectionery protocols to preserve purity and genuine taste.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-[#FFFDF9] p-6 rounded-2xl border border-brand-border shadow-soft text-center space-y-3">
-              <div className="w-14 h-14 rounded-2xl bg-amber-100/70 border border-amber-300/60 text-brand-gold-dark flex items-center justify-center mx-auto shadow-xs">
-                <Flame className="w-7 h-7" />
+              <div className="w-12 h-12 rounded-2xl bg-amber-100/70 border border-amber-300/60 text-brand-gold-dark flex items-center justify-center mx-auto shadow-xs">
+                <Flame className="w-6 h-6" />
               </div>
-              <h3 className="font-serif font-bold text-base text-brand-charcoal">100% Pure Desi Cow Ghee</h3>
+              <h3 className="font-serif font-bold text-sm text-brand-charcoal">100% Pure Desi Ghee</h3>
               <p className="text-xs text-stone-600 leading-relaxed">
-                We strictly use 100% pure country cow ghee, giving our sweets their signature aroma and wholesome velvety richness.
+                Prepared exclusively with pure country cow ghee for signature aroma and velvety richness.
               </p>
             </div>
 
             <div className="bg-[#FFFDF9] p-6 rounded-2xl border border-brand-border shadow-soft text-center space-y-3">
-              <div className="w-14 h-14 rounded-2xl bg-amber-100/70 border border-amber-300/60 text-brand-gold-dark flex items-center justify-center mx-auto shadow-xs">
-                <Award className="w-7 h-7" />
+              <div className="w-12 h-12 rounded-2xl bg-amber-100/70 border border-amber-300/60 text-brand-gold-dark flex items-center justify-center mx-auto shadow-xs">
+                <Award className="w-6 h-6" />
               </div>
-              <h3 className="font-serif font-bold text-base text-brand-charcoal">Original 1900 Kakinada Recipe</h3>
+              <h3 className="font-serif font-bold text-sm text-brand-charcoal">Original 1900 Recipe</h3>
               <p className="text-xs text-stone-600 leading-relaxed">
-                Generations of confectionery mastery creating the authentic Gottam Kaja and Nethi Kaja with crispy layers and aromatic syrup.
+                Generational confectionery mastery creating authentic Gottam Kaja and Nethi Kaja.
               </p>
             </div>
 
             <div className="bg-[#FFFDF9] p-6 rounded-2xl border border-brand-border shadow-soft text-center space-y-3">
-              <div className="w-14 h-14 rounded-2xl bg-amber-100/70 border border-amber-300/60 text-brand-gold-dark flex items-center justify-center mx-auto shadow-xs">
-                <ShieldCheck className="w-7 h-7" />
+              <div className="w-12 h-12 rounded-2xl bg-amber-100/70 border border-amber-300/60 text-brand-gold-dark flex items-center justify-center mx-auto shadow-xs">
+                <ShieldCheck className="w-6 h-6" />
               </div>
-              <h3 className="font-serif font-bold text-base text-brand-charcoal">Vacuum-Sealed Fresh Packing</h3>
+              <h3 className="font-serif font-bold text-sm text-brand-charcoal">Vacuum-Sealed Packing</h3>
               <p className="text-xs text-stone-600 leading-relaxed">
-                Specialized tamper-proof food grade packaging ensures peak crispiness and freshness delivered right to your doorstep.
+                Food grade tamper-proof packing ensuring peak crispiness and freshness delivered to your doorstep.
+              </p>
+            </div>
+
+            <div className="bg-[#FFFDF9] p-6 rounded-2xl border border-brand-border shadow-soft text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100/70 border border-amber-300/60 text-brand-gold-dark flex items-center justify-center mx-auto shadow-xs">
+                <Clock className="w-6 h-6" />
+              </div>
+              <h3 className="font-serif font-bold text-sm text-brand-charcoal">Fresh Daily Batches</h3>
+              <p className="text-xs text-stone-600 leading-relaxed">
+                Slow-simmered daily in morning batches to ensure optimal taste and extended shelf-life.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 5. VERIFIED REVIEWS */}
+      {/* 7. CUSTOMER REVIEWS */}
       <section id="reviews" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <div className="inline-flex items-center gap-1 text-xs font-bold text-brand-gold uppercase tracking-wider">
             <Heart className="w-3.5 h-3.5 fill-brand-gold text-brand-gold" />
             <span>Customer Testimonials</span>
           </div>
-          <h2 className="font-serif font-black text-2xl sm:text-3xl text-brand-charcoal">
+          <h2 className="font-serif font-black text-3xl text-brand-charcoal">
             Stories of Celebration & Taste
           </h2>
         </div>
@@ -577,7 +810,96 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
         </div>
       </section>
 
-      {/* 6. STORE LOCATIONS & INQUIRY FORM */}
+      {/* 8. AI ASSISTANT / RAG DISCOVERY SECTION */}
+      {onOpenChatbot && (
+        <section id="ai-assistant" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-br from-stone-900 via-brand-maroon-dark to-black rounded-3xl p-8 sm:p-12 border-2 border-brand-gold/50 shadow-float text-[#FFFDF9] relative overflow-hidden">
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              <div className="lg:col-span-8 space-y-4">
+                <div className="inline-flex items-center gap-2 bg-brand-gold/20 text-brand-gold-light border border-brand-gold/40 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                  <Sparkles className="w-4 h-4 text-brand-gold" />
+                  <span>Interactive AI Sweet Connoisseur</span>
+                </div>
+                <h2 className="font-serif font-black text-3xl sm:text-4xl text-[#FFFDF9] leading-tight">
+                  Need Help Choosing The Perfect Sweets?
+                </h2>
+                <p className="text-xs sm:text-sm text-stone-300 max-w-xl leading-relaxed">
+                  Ask our AI Assistant about ingredients, allergen information, shelf-life, custom gift assortments, or taste profiles across all 43 authentic delicacies.
+                </p>
+
+                {/* Sample Prompt Chips */}
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {[
+                    '🎁 Best sweets for wedding & festive gifting',
+                    '✨ Difference between Gottam Kaja & Madatha Kaja',
+                    '🌿 Pure ghee sweets with organic jaggery',
+                  ].map((prompt, i) => (
+                    <button
+                      key={i}
+                      onClick={onOpenChatbot}
+                      className="text-[11px] bg-white/10 hover:bg-white/20 border border-white/20 rounded-full px-3 py-1.5 transition-all text-stone-200"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="lg:col-span-4 flex flex-col items-start lg:items-end justify-center">
+                <button
+                  onClick={onOpenChatbot}
+                  className="flex items-center gap-2.5 bg-gradient-to-r from-brand-gold to-amber-500 hover:from-amber-500 hover:to-brand-gold text-stone-950 px-8 py-4 rounded-full font-black text-sm tracking-wide shadow-gold hover:scale-105 transition-all"
+                >
+                  <Sparkles className="w-5 h-5 fill-current" />
+                  <span>Launch AI Assistant</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 9. SPECIAL OFFERS SECTION */}
+      <section id="offers" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-gradient-to-r from-brand-maroon via-brand-maroon-dark to-stone-900 rounded-3xl p-6 sm:p-10 border-2 border-brand-gold/50 shadow-float text-[#FFFDF9] relative overflow-hidden">
+          <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-7 space-y-3">
+              <div className="inline-flex items-center gap-1.5 bg-brand-gold/20 text-brand-gold-light border border-brand-gold/40 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                <Gift className="w-3.5 h-3.5" />
+                <span>Festive Celebration Promo</span>
+              </div>
+              <h3 className="font-serif font-black text-2xl sm:text-4xl text-[#FFFDF9] leading-tight">
+                Use Coupon Codes For Instant Discounts!
+              </h3>
+              <p className="text-xs sm:text-sm text-stone-300 max-w-xl">
+                Apply coupon code <code className="bg-black/50 px-2 py-0.5 rounded text-brand-gold-light font-mono font-bold">FESTIVE15</code> for 15% off orders over ₹999, or <code className="bg-black/50 px-2 py-0.5 rounded text-brand-gold-light font-mono font-bold">WELCOME10</code> for 10% off your first order.
+              </p>
+            </div>
+
+            <div className="lg:col-span-5 flex flex-col gap-2.5">
+              {[
+                { code: 'FESTIVE15', title: '15% Off All Sweets', min: '₹999' },
+                { code: 'KAJA50', title: '10% Off Gottam & Nethi Kaja', min: '₹499' },
+                { code: 'WELCOME10', title: '10% Welcome Discount', min: '₹300' },
+              ].map((c) => (
+                <div key={c.code} className="bg-white/10 backdrop-blur-md border border-brand-gold/30 rounded-2xl p-3 flex items-center justify-between">
+                  <div>
+                    <span className="font-mono font-black text-xs text-brand-gold-light bg-black/40 px-2 py-0.5 rounded border border-brand-gold/40">
+                      {c.code}
+                    </span>
+                    <h4 className="font-serif font-bold text-xs text-[#FFFDF9] mt-0.5">{c.title}</h4>
+                  </div>
+                  <span className="text-[10px] text-stone-300">Min. {c.min}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 10. STORE LOCATIONS & INQUIRY FORM */}
       <section id="contact" className="bg-brand-surface py-16 border-t border-brand-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
