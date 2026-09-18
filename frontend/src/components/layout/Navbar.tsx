@@ -83,12 +83,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
 
       {/* Main Sticky Navbar */}
       <header
-        className={`sticky top-0 z-40 transition-all duration-300 ${
-          isScrolled
-            ? 'glass-panel shadow-soft py-3'
-            : location.pathname === '/'
-              ? 'bg-stone-950/85 backdrop-blur-md border-b border-brand-gold/30 text-white py-3.5'
-              : 'bg-white/95 backdrop-blur-md border-b border-brand-border py-4'
+        className={`sticky top-0 z-40 bg-[#FFFFFF] border-b border-[#F0E5DC] transition-all duration-200 ${
+          isScrolled ? 'shadow-soft py-2.5 sm:py-3' : 'py-3 sm:py-3.5'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -100,35 +96,29 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
                 <span className="text-white font-serif font-bold text-xl tracking-wider">K</span>
               </div>
               <div className="flex flex-col">
-                <span className={`font-serif font-black text-2xl tracking-tight leading-none ${
-                  !isScrolled && location.pathname === '/' ? 'text-white' : 'text-brand-primary'
-                }`}>
+                <span className="font-serif font-black text-2xl tracking-tight leading-none text-brand-primary">
                   KOTAIAH<span className="text-brand-gold"> SWEETS</span>
                 </span>
-                <span className={`text-[10px] tracking-widest uppercase font-bold mt-0.5 ${
-                  !isScrolled && location.pathname === '/' ? 'text-stone-300' : 'text-brand-muted'
-                }`}>
+                <span className="text-[10px] tracking-widest uppercase font-bold mt-0.5 text-[#6B625D]">
                   Since 1900 • Kakinada
                 </span>
               </div>
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className={`hidden lg:flex items-center gap-6 font-medium text-sm ${
-              !isScrolled && location.pathname === '/' ? 'text-stone-200' : 'text-brand-charcoal'
-            }`}>
+            <nav className="hidden lg:flex items-center gap-6 font-medium text-sm text-[#261C18]">
               <Link
                 to="/"
-                className={`transition-colors hover:text-brand-primary ${
-                  location.pathname === '/' ? 'text-brand-primary font-bold' : ''
+                className={`transition-colors hover:text-[#E85D04] ${
+                  location.pathname === '/' ? 'text-[#E85D04] font-bold' : ''
                 }`}
               >
                 Home
               </Link>
               <Link
                 to="/products"
-                className={`transition-colors hover:text-brand-primary ${
-                  location.pathname === '/products' ? 'text-brand-primary font-semibold' : ''
+                className={`transition-colors hover:text-[#E85D04] ${
+                  location.pathname === '/products' ? 'text-[#E85D04] font-semibold' : ''
                 }`}
               >
                 All Sweets
@@ -138,16 +128,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
               <div className="relative group py-2">
                 <Link
                   to="/products"
-                  className="flex items-center gap-1 transition-colors hover:text-brand-primary"
+                  className="flex items-center gap-1 transition-colors hover:text-[#E85D04]"
                 >
                   Categories <ChevronDown className="w-3.5 h-3.5 opacity-60 group-hover:rotate-180 transition-transform" />
                 </Link>
-                <div className="absolute top-full left-0 hidden group-hover:block w-56 bg-white rounded-xl shadow-card border border-brand-border p-2 z-50 animate-in fade-in duration-200 text-brand-charcoal">
+                <div className="absolute top-full left-0 hidden group-hover:block w-56 bg-white rounded-xl shadow-card border border-[#F0E5DC] p-2 z-50 animate-in fade-in duration-200 text-[#261C18]">
                   {categories.map((cat) => (
                     <Link
                       key={cat.id}
                       to={`/products?category=${cat.id}`}
-                      className="block px-3 py-2 text-xs font-medium text-brand-charcoal hover:bg-brand-light-orange hover:text-brand-primary rounded-lg transition-colors"
+                      className="block px-3 py-2 text-xs font-medium text-[#261C18] hover:bg-[#FFF0E6] hover:text-[#E85D04] rounded-lg transition-colors"
                     >
                       {cat.name}
                     </Link>
@@ -157,18 +147,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
 
               <Link
                 to="/offers"
-                className="transition-colors hover:text-brand-primary font-semibold flex items-center gap-1 text-brand-primary"
+                className="transition-colors hover:text-[#E85D04] font-semibold flex items-center gap-1 text-[#E85D04]"
               >
-                <span className="w-2 h-2 rounded-full bg-brand-primary animate-ping inline-block" />
+                <span className="w-2 h-2 rounded-full bg-[#E85D04] animate-ping inline-block" />
                 Offers
               </Link>
-              <Link to="/about" className="transition-colors hover:text-brand-primary">
+              <Link to="/about" className="transition-colors hover:text-[#E85D04]">
                 Heritage
               </Link>
-              <Link to="/reviews" className="transition-colors hover:text-brand-primary">
+              <Link to="/reviews" className="transition-colors hover:text-[#E85D04]">
                 Reviews
               </Link>
-              <Link to="/contact" className="transition-colors hover:text-brand-primary">
+              <Link to="/contact" className="transition-colors hover:text-[#E85D04]">
                 Contact
               </Link>
             </nav>
@@ -180,24 +170,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search Gottam Kaja, Mysore Pak..."
-                className={`w-full text-xs pl-9 pr-4 py-2 rounded-full border transition-all ${
-                  !isScrolled && location.pathname === '/'
-                    ? 'bg-stone-900/90 text-white placeholder:text-stone-400 border-stone-700 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary'
-                    : 'bg-brand-light-orange text-brand-charcoal border-brand-border focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary'
-                }`}
+                className="w-full text-xs pl-9 pr-4 py-2 rounded-full border bg-[#FFF9F5] text-[#261C18] placeholder:text-[#6B625D] border-[#F0E5DC] focus:outline-none focus:border-[#E85D04] focus:ring-1 focus:ring-[#E85D04] transition-all"
               />
-              <Search className={`w-4 h-4 absolute left-3 top-2.5 pointer-events-none ${
-                !isScrolled && location.pathname === '/' ? 'text-stone-400' : 'text-brand-muted'
-              }`} />
+              <Search className="w-4 h-4 absolute left-3 top-2.5 pointer-events-none text-[#6B625D]" />
             </form>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3.5">
               {/* AI Assistant Launcher Button */}
               {onOpenChatbot && (
                 <button
                   onClick={onOpenChatbot}
-                  className="hidden sm:flex items-center gap-1.5 bg-brand-primary hover:bg-brand-primary-hover text-white px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-primary transition-all border border-brand-gold/40 hover:scale-105"
+                  className="hidden sm:flex items-center gap-1.5 bg-[#E85D04] hover:bg-[#D04E00] text-white px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-xs transition-all border border-[#D4A24C]/40 hover:scale-105"
                   title="Open AI Shopping Assistant"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-brand-gold-light" />
@@ -208,14 +192,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
               {/* Wishlist Link */}
               <Link
                 to="/account?tab=wishlist"
-                className={`relative p-2 hover:text-brand-primary transition-colors ${
-                  !isScrolled && location.pathname === '/' ? 'text-stone-200' : 'text-brand-charcoal'
-                }`}
+                aria-label="Wishlist"
+                className="relative w-10 h-10 flex items-center justify-center rounded-full text-[#261C18] hover:text-[#E85D04] hover:bg-[#FFF0E6] active:bg-[#FFF0E6] hover:scale-[1.03] active:scale-95 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E85D04]"
                 title="Wishlist"
               >
-                <Heart className="w-5 h-5" />
+                <Heart className="w-[22px] h-[22px] stroke-[1.8] transition-colors" />
                 {wishlistIds.length > 0 && (
-                  <span className="absolute top-1 right-1 bg-brand-primary text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  <span className="absolute top-1 right-1 bg-[#E85D04] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none shadow-xs">
                     {wishlistIds.length}
                   </span>
                 )}
@@ -224,14 +207,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
               {/* Cart Link */}
               <Link
                 to="/cart"
-                className={`relative p-2 hover:text-brand-primary transition-colors ${
-                  !isScrolled && location.pathname === '/' ? 'text-stone-200' : 'text-brand-charcoal'
-                }`}
+                aria-label="Shopping Cart"
+                className="relative w-10 h-10 flex items-center justify-center rounded-full text-[#261C18] hover:text-[#E85D04] hover:bg-[#FFF0E6] active:bg-[#FFF0E6] hover:scale-[1.03] active:scale-95 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E85D04]"
                 title="Shopping Cart"
               >
-                <ShoppingBag className="w-5 h-5" />
+                <ShoppingBag className="w-[22px] h-[22px] stroke-[1.8] transition-colors" />
                 {totalItemsCount > 0 && (
-                  <span className="absolute top-1 right-1 bg-brand-primary text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center animate-bounce shadow-xs">
+                  <span className="absolute top-1 right-1 bg-[#E85D04] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none shadow-xs">
                     {totalItemsCount}
                   </span>
                 )}
@@ -243,21 +225,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
                   <div className="relative">
                     <button
                       onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                      className="flex items-center gap-1 p-1.5 rounded-full border border-brand-border hover:border-brand-primary transition-all bg-brand-light-orange"
+                      className="flex items-center gap-1 p-1.5 rounded-full border border-[#F0E5DC] hover:border-[#E85D04] transition-all bg-[#FFF0E6]"
+                      aria-label="User Account Menu"
                     >
-                      <div className="w-7 h-7 rounded-full bg-brand-primary text-white flex items-center justify-center text-xs font-bold font-serif shadow-xs">
+                      <div className="w-7 h-7 rounded-full bg-[#E85D04] text-white flex items-center justify-center text-xs font-bold font-serif shadow-xs">
                         {profile?.full_name?.charAt(0) || user.email?.charAt(0).toUpperCase() || 'U'}
                       </div>
                     </button>
 
                     {userDropdownOpen && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-card border border-brand-border p-2 z-50 animate-in fade-in duration-150 text-brand-charcoal">
-                        <div className="px-3 py-2 border-b border-brand-border/60">
-                          <p className="text-xs font-semibold text-brand-charcoal truncate">
+                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-card border border-[#F0E5DC] p-2 z-50 animate-in fade-in duration-150 text-[#261C18]">
+                        <div className="px-3 py-2 border-b border-[#F0E5DC]/60">
+                          <p className="text-xs font-semibold text-[#261C18] truncate">
                             {profile?.full_name || 'Valued Customer'}
                           </p>
-                          <p className="text-[10px] text-brand-muted truncate">{user.email}</p>
-                          <span className="inline-block mt-1 px-2 py-0.5 bg-brand-light-orange text-brand-primary text-[9px] font-bold uppercase rounded">
+                          <p className="text-[10px] text-[#6B625D] truncate">{user.email}</p>
+                          <span className="inline-block mt-1 px-2 py-0.5 bg-[#FFF0E6] text-[#E85D04] text-[9px] font-bold uppercase rounded">
                             {role}
                           </span>
                         </div>
@@ -266,9 +249,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
                           <Link
                             to="/account"
                             onClick={() => setUserDropdownOpen(false)}
-                            className="flex items-center gap-2 px-3 py-2 text-xs text-brand-charcoal hover:bg-brand-light-orange hover:text-brand-primary rounded-lg transition-colors"
+                            className="flex items-center gap-2 px-3 py-2 text-xs text-[#261C18] hover:bg-[#FFF0E6] hover:text-[#E85D04] rounded-lg transition-colors"
                           >
-                            <User className="w-3.5 h-3.5 text-brand-primary" />
+                            <User className="w-3.5 h-3.5 text-[#E85D04]" />
                             My Account & Orders
                           </Link>
 
@@ -276,9 +259,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
                             <Link
                               to="/owner"
                               onClick={() => setUserDropdownOpen(false)}
-                              className="flex items-center gap-2 px-3 py-2 text-xs text-brand-primary font-semibold hover:bg-brand-light-orange rounded-lg transition-colors"
+                              className="flex items-center gap-2 px-3 py-2 text-xs text-[#E85D04] font-semibold hover:bg-[#FFF0E6] rounded-lg transition-colors"
                             >
-                              <Store className="w-3.5 h-3.5 text-brand-primary" />
+                              <Store className="w-3.5 h-3.5 text-[#E85D04]" />
                               Shop Owner Portal
                             </Link>
                           )}
@@ -287,7 +270,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
                             <Link
                               to="/admin"
                               onClick={() => setUserDropdownOpen(false)}
-                              className="flex items-center gap-2 px-3 py-2 text-xs text-brand-gold-dark font-semibold hover:bg-brand-light-orange rounded-lg transition-colors"
+                              className="flex items-center gap-2 px-3 py-2 text-xs text-brand-gold-dark font-semibold hover:bg-[#FFF0E6] rounded-lg transition-colors"
                             >
                               <ShieldCheck className="w-3.5 h-3.5 text-brand-gold" />
                               Super Admin Console
@@ -308,11 +291,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
                 ) : (
                   <Link
                     to="/login"
-                    className={`flex items-center gap-1.5 border px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                      !isScrolled && location.pathname === '/'
-                        ? 'bg-brand-primary text-white border-brand-primary hover:bg-brand-primary-hover font-bold shadow-primary'
-                        : 'bg-brand-primary text-white border-brand-primary hover:bg-brand-primary-hover shadow-xs'
-                    }`}
+                    className="flex items-center gap-1.5 bg-[#E85D04] text-white border border-[#E85D04] hover:bg-[#D04E00] px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-xs transition-all"
                   >
                     <User className="w-3.5 h-3.5" />
                     <span>Login</span>
@@ -323,11 +302,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
               {/* Mobile Menu Toggle Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`lg:hidden p-2 hover:text-brand-primary ${
-                  !isScrolled && location.pathname === '/' ? 'text-stone-200' : 'text-brand-charcoal'
-                }`}
+                aria-label="Toggle Navigation Menu"
+                className="lg:hidden w-10 h-10 flex items-center justify-center rounded-full text-[#261C18] hover:bg-[#FFF0E6] hover:text-[#E85D04] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E85D04]"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {mobileMenuOpen ? <X className="w-5 h-5 stroke-[2]" /> : <Menu className="w-5 h-5 stroke-[2]" />}
               </button>
             </div>
           </div>
