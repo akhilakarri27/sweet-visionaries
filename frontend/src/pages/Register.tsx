@@ -68,9 +68,28 @@ export const Register: React.FC = () => {
         </div>
 
         {errorMessage && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{errorMessage}</span>
+          <div className="space-y-3 p-4 bg-amber-50/90 border border-amber-300/80 rounded-2xl text-xs text-amber-950">
+            <div className="flex items-start gap-2.5">
+              <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="font-bold text-amber-900">Supabase SMTP Rate Limit Notice</p>
+                <p className="text-stone-700 leading-relaxed">{errorMessage}</p>
+              </div>
+            </div>
+
+            {errorMessage.toLowerCase().includes('rate limit') && (
+              <div className="pt-2 border-t border-amber-200/80 space-y-2 text-[11px] text-stone-700">
+                <p className="font-semibold text-amber-900">⚡ How to fix this in 10 seconds:</p>
+                <ol className="list-decimal list-inside space-y-1 pl-1">
+                  <li>Open your Supabase Project: <a href="https://supabase.com/dashboard/project/bunigrqjuvrenwgsodab/auth/providers" target="_blank" rel="noopener noreferrer" className="text-brand-primary underline font-bold">Auth Providers Settings ↗</a></li>
+                  <li>Click on <strong>Email</strong> to expand the settings.</li>
+                  <li>Turn <strong>Confirm email</strong> to <strong>OFF</strong> and click <strong>Save</strong>.</li>
+                </ol>
+                <p className="text-[10px] text-stone-500 italic">
+                  Turning off "Confirm email" enables instant registration with 0 email limits.
+                </p>
+              </div>
+            )}
           </div>
         )}
 

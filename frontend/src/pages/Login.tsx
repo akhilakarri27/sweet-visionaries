@@ -58,9 +58,25 @@ export const Login: React.FC = () => {
         </div>
 
         {errorMessage && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{errorMessage}</span>
+          <div className="space-y-3 p-4 bg-amber-50/90 border border-amber-300/80 rounded-2xl text-xs text-amber-950">
+            <div className="flex items-start gap-2.5">
+              <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="font-bold text-amber-900">Notice</p>
+                <p className="text-stone-700 leading-relaxed">{errorMessage}</p>
+              </div>
+            </div>
+
+            {(errorMessage.toLowerCase().includes('email is not confirmed') || errorMessage.toLowerCase().includes('rate limit')) && (
+              <div className="pt-2 border-t border-amber-200/80 space-y-1.5 text-[11px] text-stone-700">
+                <p className="font-semibold text-amber-900">⚡ To allow instant sign-in without email confirmation:</p>
+                <ol className="list-decimal list-inside space-y-1 pl-1">
+                  <li>Open <a href="https://supabase.com/dashboard/project/bunigrqjuvrenwgsodab/auth/providers" target="_blank" rel="noopener noreferrer" className="text-brand-primary underline font-bold">Supabase Auth Providers ↗</a></li>
+                  <li>Click on <strong>Email</strong> provider.</li>
+                  <li>Turn <strong>Confirm email</strong> to <strong>OFF</strong> and click <strong>Save</strong>.</li>
+                </ol>
+              </div>
+            )}
           </div>
         )}
 
