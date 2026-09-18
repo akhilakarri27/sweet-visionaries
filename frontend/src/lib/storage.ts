@@ -2,7 +2,40 @@ import { supabase } from './supabase';
 import { Product } from '../types/database';
 
 export const STORAGE_BUCKET = 'product-images';
+export const HERO_STORAGE_BUCKET = 'hero-videos';
 export const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1599785209707-a456fc1337bb?w=800&q=80';
+
+// Default Supabase Storage URL for Hero Video and Poster
+export const DEFAULT_HERO_VIDEO_URL = `${import.meta.env.VITE_SUPABASE_URL || 'https://bunigrqjuvrenwgsodab.supabase.co'}/storage/v1/object/public/hero-videos/kotaiah-sweets-hero.mp4`;
+export const DEFAULT_HERO_POSTER_URL = '/sweets/kakinada-gottam-kaja.jpg';
+
+/**
+ * Fetch dynamic site configuration from Supabase site_settings table
+ */
+export async function getSiteSetting<T>(key: string, defaultValue: T): Promise<T> {
+  try {
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', key)
+      .maybeSingle();
+
+    if (error || !data || data.value === undefined || data.value === null) {
+      return defaultValue;
+    }
+
+    if (typeof data.value === 'string') {
+      // Remove any surrounding quotes if stored as JSON string
+      const val = data.value.replace(/^"(.*)"$/, '$1');
+      return val as unknown as T;
+    }
+
+    return data.value as T;
+  } catch (err) {
+    console.warn(`Could not load site setting '${key}', using default:`, err);
+    return defaultValue;
+  }
+}
 
 /**
  * Generate standard Supabase Storage public URL for a sweet slug

@@ -27,7 +27,13 @@ import { DEMO_CATEGORIES, DEMO_PRODUCTS } from '../lib/demoData';
 import { ProductCard } from '../components/products/ProductCard';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
-import { getProductImageUrl, DEFAULT_FALLBACK_IMAGE } from '../lib/storage';
+import {
+  getProductImageUrl,
+  DEFAULT_FALLBACK_IMAGE,
+  DEFAULT_HERO_VIDEO_URL,
+  DEFAULT_HERO_POSTER_URL,
+  getSiteSetting
+} from '../lib/storage';
 
 interface HomeProps {
   onOpenChatbot?: () => void;
@@ -44,6 +50,10 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
   const [selectedCategoryTab, setSelectedCategoryTab] = useState<string>('all');
   const [offers, setOffers] = useState<Offer[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+
+  // Hero Video & Poster URLs loaded from Supabase site_settings
+  const [heroVideoUrl, setHeroVideoUrl] = useState<string>(DEFAULT_HERO_VIDEO_URL);
+  const [heroPosterUrl, setHeroPosterUrl] = useState<string>(DEFAULT_HERO_POSTER_URL);
   
   // Quick View Modal State
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
@@ -58,6 +68,14 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
   useEffect(() => {
     const loadHomeData = async () => {
       try {
+        // 1. Fetch Dynamic Hero Video & Poster Settings
+        const [videoSetting, posterSetting] = await Promise.all([
+          getSiteSetting<string>('hero_video_url', DEFAULT_HERO_VIDEO_URL),
+          getSiteSetting<string>('hero_poster_url', DEFAULT_HERO_POSTER_URL),
+        ]);
+        if (videoSetting) setHeroVideoUrl(videoSetting);
+        if (posterSetting) setHeroPosterUrl(posterSetting);
+
         const { data: cats } = await supabase
           .from('categories')
           .select('*')
@@ -141,102 +159,107 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
   return (
     <div className="space-y-16 sm:space-y-24">
       
-      {/* 1. HERO SHOWCASE */}
-      <section className="relative overflow-hidden bg-brand-warm-gradient pt-8 pb-16 lg:pt-16 lg:pb-24 border-b border-brand-border/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            {/* Hero Text */}
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-brand-surface border border-brand-gold/40 px-3.5 py-1.5 rounded-full text-xs font-semibold text-brand-maroon shadow-xs">
-                <Sparkles className="w-4 h-4 text-brand-gold animate-spin-slow" />
-                <span>Master Artisans of Authentic Andhra Sweets • Since 1900</span>
-              </div>
+      {/* 1. FULL-WIDTH HERO VIDEO SECTION */}
+      <section className="relative w-full min-h-[85vh] lg:min-h-[92vh] flex items-center justify-center overflow-hidden bg-stone-950 border-b border-brand-gold/30">
+        
+        {/* Full-width Background Video */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden">
+          <video
+            key={heroVideoUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster={heroPosterUrl}
+            className="absolute inset-0 w-full h-full object-cover object-center scale-[1.02] transform transition-transform duration-1000"
+          >
+            <source src={heroVideoUrl} type="video/mp4" />
+            {/* Fallback image if video cannot be played */}
+            <img
+              src={heroPosterUrl}
+              alt="Kotaiah Sweets Traditional Delicacies"
+              className="w-full h-full object-cover"
+            />
+          </video>
+        </div>
 
-              <h1 className="font-serif font-black text-4xl sm:text-5xl lg:text-6xl text-brand-charcoal tracking-tight leading-[1.15]">
-                Authentic Traditional Sweets, <br className="hidden sm:inline" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-maroon via-brand-maroon-light to-brand-gold">
-                  Made With Pure Devotion.
-                </span>
-              </h1>
+        {/* Subtle Warm Vignette Overlay - Keeps video clear while giving text high readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/60 pointer-events-none" />
+        <div className="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-black/50 pointer-events-none" />
 
-              <p className="text-sm sm:text-base text-stone-600 max-w-2xl leading-relaxed font-sans mx-auto lg:mx-0">
-                Taste the world-famous <strong>Kakinada Gottam Kaja</strong>, <strong>Nethi Kaja</strong>, <strong>Moti Chor Laddu</strong>, <strong>Royal Mysore Pak</strong>, <strong>Paalkova</strong>, and <strong>Atreyapuram Pootharekulu</strong> prepared fresh daily with 100% pure desi cow ghee.
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
-                <a
-                  href="#menu"
-                  className="flex items-center gap-2 bg-gradient-to-r from-brand-maroon to-brand-maroon-dark text-brand-gold-light px-7 py-3.5 rounded-full font-bold text-sm shadow-gold hover:scale-105 hover:shadow-float transition-all"
-                >
-                  <span>Explore All Sweets Menu</span>
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-
-                {onOpenChatbot && (
-                  <button
-                    onClick={onOpenChatbot}
-                    className="flex items-center gap-2 bg-brand-surface border border-brand-gold text-brand-maroon px-6 py-3.5 rounded-full font-bold text-sm hover:bg-brand-cream transition-all hover:scale-105 shadow-soft"
-                  >
-                    <Sparkles className="w-4 h-4 text-brand-gold" />
-                    <span>Ask Grok Shopping Assistant</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Trust Metrics */}
-              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-brand-border/80 max-w-lg mx-auto lg:mx-0">
-                <div>
-                  <div className="font-serif font-bold text-xl sm:text-2xl text-brand-maroon">120+</div>
-                  <div className="text-[11px] text-stone-500 font-medium">Years Heritage</div>
-                </div>
-                <div>
-                  <div className="font-serif font-bold text-xl sm:text-2xl text-brand-maroon">100%</div>
-                  <div className="text-[11px] text-stone-500 font-medium">Pure Desi Ghee</div>
-                </div>
-                <div>
-                  <div className="font-serif font-bold text-xl sm:text-2xl text-brand-maroon">4.9 ★</div>
-                  <div className="text-[11px] text-stone-500 font-medium">1,200+ Reviews</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Hero Visual Imagery */}
-            <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto max-w-md lg:max-w-none">
-                <div className="absolute -inset-2 rounded-3xl bg-gradient-to-tr from-brand-gold to-brand-maroon opacity-30 blur-lg" />
-                
-                <div className="relative rounded-3xl overflow-hidden border-2 border-brand-gold/60 shadow-float bg-[#FFFDF9]">
-                  <img
-                    src="https://images.unsplash.com/photo-1599785209707-a456fc1337bb?w=800&q=85"
-                    alt="Authentic Kakinada Gottam Kaja and Nethi Kaja"
-                    className="w-full h-80 sm:h-96 object-cover object-center transform hover:scale-105 transition-transform duration-700"
-                  />
-                  
-                  {/* Floating Highlight Card */}
-                  <div className="absolute bottom-4 left-4 right-4 glass-panel p-3.5 rounded-2xl border border-brand-gold/40 shadow-card flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-brand-gold-dark">
-                        ⭐ Legend of Andhra
-                      </span>
-                      <h3 className="font-serif font-bold text-sm text-brand-charcoal">
-                        Kakinada Gottam Kaja & Nethi Kaja
-                      </h3>
-                      <p className="text-[11px] text-stone-500">Pure Ghee • Crispy outer • Juicy syrup core</p>
-                    </div>
-                    <a
-                      href="#menu"
-                      className="bg-brand-maroon text-brand-gold-light p-2.5 rounded-xl hover:bg-brand-gold hover:text-white transition-colors"
-                    >
-                      <ArrowRight className="w-4 h-4" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+        {/* Hero Content Area */}
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center space-y-7">
+          
+          {/* Heritage Pill Badge */}
+          <div className="inline-flex items-center gap-2 bg-brand-maroon/85 border border-brand-gold/60 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-brand-gold-light shadow-gold">
+            <Sparkles className="w-4 h-4 text-brand-gold animate-spin-slow" />
+            <span>Master Artisans of Authentic Andhra Sweets • Since 1900</span>
           </div>
+
+          {/* Headline and Tagline */}
+          <div className="space-y-3">
+            <h1 className="font-serif font-black text-4xl sm:text-6xl lg:text-7xl text-[#FFFDF9] tracking-tight leading-[1.1] drop-shadow-lg">
+              Kotaiah Sweets
+            </h1>
+            <p className="font-serif italic text-lg sm:text-2xl lg:text-3xl text-brand-gold-light drop-shadow font-medium">
+              "Traditional Taste, Made for Every Celebration"
+            </p>
+          </div>
+
+          {/* Narrative Summary */}
+          <p className="text-sm sm:text-base text-stone-200 max-w-2xl leading-relaxed font-sans mx-auto drop-shadow">
+            Taste the world-renowned <strong>Kakinada Gottam Kaja</strong>, <strong>Nethi Kaja</strong>, <strong>Atreyapuram Pootharekulu</strong>, <strong>Royal Mysore Pak</strong>, and handcrafted savouries made with 100% pure desi cow ghee.
+          </p>
+
+          {/* Action CTA Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+            <a
+              href="#menu"
+              className="flex items-center gap-2 bg-gradient-to-r from-brand-gold to-amber-500 hover:from-amber-500 hover:to-brand-gold text-stone-950 px-8 py-4 rounded-full font-black text-sm tracking-wide shadow-gold hover:scale-105 hover:shadow-float transition-all cursor-pointer"
+            >
+              <span>Explore Sweets</span>
+              <ArrowRight className="w-4 h-4" />
+            </a>
+
+            <Link
+              to="/products"
+              className="flex items-center gap-2 bg-brand-maroon/90 hover:bg-brand-maroon text-[#FFFDF9] border border-brand-gold/60 px-8 py-4 rounded-full font-bold text-sm shadow-soft hover:scale-105 transition-all backdrop-blur-md"
+            >
+              <ShoppingBag className="w-4 h-4 text-brand-gold-light" />
+              <span>Order Now</span>
+            </Link>
+
+            {onOpenChatbot && (
+              <button
+                onClick={onOpenChatbot}
+                className="flex items-center gap-2 bg-white/15 hover:bg-white/25 text-white border border-white/30 px-6 py-4 rounded-full font-bold text-xs shadow-soft hover:scale-105 transition-all backdrop-blur-md"
+              >
+                <Sparkles className="w-4 h-4 text-brand-gold-light" />
+                <span>Ask AI Assistant</span>
+              </button>
+            )}
+          </div>
+
+          {/* Trust Metrics Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 border-t border-white/20 max-w-3xl mx-auto">
+            <div className="bg-black/40 backdrop-blur-xs p-3.5 rounded-2xl border border-white/10 text-center">
+              <div className="font-serif font-black text-xl sm:text-2xl text-brand-gold-light">120+</div>
+              <div className="text-[11px] text-stone-300 font-medium">Years Heritage</div>
+            </div>
+            <div className="bg-black/40 backdrop-blur-xs p-3.5 rounded-2xl border border-white/10 text-center">
+              <div className="font-serif font-black text-xl sm:text-2xl text-brand-gold-light">100%</div>
+              <div className="text-[11px] text-stone-300 font-medium">Pure Desi Cow Ghee</div>
+            </div>
+            <div className="bg-black/40 backdrop-blur-xs p-3.5 rounded-2xl border border-white/10 text-center">
+              <div className="font-serif font-black text-xl sm:text-2xl text-brand-gold-light">4.9 ★</div>
+              <div className="text-[11px] text-stone-300 font-medium">1,200+ Reviews</div>
+            </div>
+            <div className="bg-black/40 backdrop-blur-xs p-3.5 rounded-2xl border border-white/10 text-center">
+              <div className="font-serif font-black text-xl sm:text-2xl text-brand-gold-light">Fresh</div>
+              <div className="text-[11px] text-stone-300 font-medium">Daily Pure Batches</div>
+            </div>
+          </div>
+
         </div>
       </section>
 
