@@ -252,6 +252,10 @@ Storage Instructions: ${p.storage_instructions || 'Information not currently ava
     }
 
     // 7. Attach structured verified product objects for frontend cards
+    if (parsedProductIds.length === 0 && retrievedProducts.length > 0) {
+      parsedProductIds = retrievedProducts.slice(0, 3).map(p => p.id);
+    }
+
     const recommendedProducts: GroundedProduct[] = liveProducts
       .filter(p => parsedProductIds.includes(p.id))
       .map(p => {

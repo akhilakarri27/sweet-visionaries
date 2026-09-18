@@ -14,10 +14,11 @@ export interface ChatMessage {
 
 export class XAIService {
   private apiKey: string;
-  private baseUrl: string = 'https://api.x.ai/v1';
+  private baseUrl: string;
 
   constructor() {
     this.apiKey = config.xaiApiKey;
+    this.baseUrl = config.xaiBaseUrl || 'https://api.x.ai/v1';
   }
 
   /**

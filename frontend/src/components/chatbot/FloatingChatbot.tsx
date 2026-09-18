@@ -65,6 +65,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [addedItemIds, setAddedItemIds] = useState<Record<string, boolean>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const suggestedQuestions = [
     'Show me traditional sweets',
@@ -85,9 +86,22 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
     }
   }, [messages, isOpen]);
 
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
   const handleSendMessage = async (textToSend?: string) => {
     const query = (textToSend || input).trim();
     if (!query || isLoading) return;
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -110,6 +124,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
       const response = await fetch(`${BACKEND_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: abortControllerRef.current.signal,
         body: JSON.stringify({
           message: query,
           shopId: DEFAULT_SHOP_ID,
@@ -135,6 +150,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
 
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (err: any) {
+      if (err.name === 'AbortError') return;
       console.error('Chat error:', err);
       setMessages((prev) => [
         ...prev,

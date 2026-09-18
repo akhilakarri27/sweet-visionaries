@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 import { Product } from '../types/database';
@@ -26,19 +26,28 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   });
   const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const isFetchingRef = useRef(false);
 
-  const fetchWishlist = async () => {
+  const fetchWishlist = useCallback(async () => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+
     if (!user) {
       // Load products based on local IDs if any
       if (wishlistIds.length > 0) {
-        const { data } = await supabase
-          .from('products')
-          .select('*, product_images(*)')
-          .in('id', wishlistIds);
-        if (data) setWishlistProducts(data as Product[]);
+        try {
+          const { data } = await supabase
+            .from('products')
+            .select('*, product_images(*)')
+            .in('id', wishlistIds);
+          if (data) setWishlistProducts(data as Product[]);
+        } catch (err) {
+          console.error('Wishlist local products fetch error:', err);
+        }
       } else {
         setWishlistProducts([]);
       }
+      isFetchingRef.current = false;
       return;
     }
 
@@ -60,12 +69,13 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.error('Wishlist fetch error:', err);
     } finally {
       setIsLoading(false);
+      isFetchingRef.current = false;
     }
-  };
+  }, [user?.id, wishlistIds.length]);
 
   useEffect(() => {
     fetchWishlist();
-  }, [user]);
+  }, [user?.id]);
 
   const toggleWishlist = async (product: Product) => {
     const exists = wishlistIds.includes(product.id);

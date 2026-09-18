@@ -12,10 +12,14 @@ export interface AppConfig {
   supabaseServiceRoleKey: string;
   supabaseAnonKey: string;
   xaiApiKey: string;
+  xaiBaseUrl: string;
   xaiModel: string;
   xaiEmbeddingModel: string;
   xaiEmbeddingDim: number;
 }
+
+const rawApiKey = process.env.XAI_API_KEY || process.env.GROQ_API_KEY || '';
+const isGroqKey = rawApiKey.startsWith('gsk_');
 
 export const config: AppConfig = {
   port: parseInt(process.env.PORT || '5000', 10),
@@ -24,8 +28,9 @@ export const config: AppConfig = {
   supabaseUrl: process.env.SUPABASE_URL || 'https://bunigrqjuvrenwgsodab.supabase.co',
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '',
   supabaseAnonKey: process.env.SUPABASE_ANON_KEY || '',
-  xaiApiKey: process.env.XAI_API_KEY || '',
-  xaiModel: process.env.XAI_MODEL || 'grok-4.6',
+  xaiApiKey: rawApiKey,
+  xaiBaseUrl: process.env.XAI_BASE_URL || (isGroqKey ? 'https://api.groq.com/openai/v1' : 'https://api.x.ai/v1'),
+  xaiModel: process.env.XAI_MODEL || (isGroqKey ? 'qwen/qwen3.8-27b' : 'grok-4.6'),
   xaiEmbeddingModel: process.env.XAI_EMBEDDING_MODEL || 'embedding-bert',
   xaiEmbeddingDim: parseInt(process.env.XAI_EMBEDDING_DIM || '1536', 10),
 };

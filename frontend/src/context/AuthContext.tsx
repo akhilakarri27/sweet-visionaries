@@ -24,8 +24,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [role, setRole] = useState<UserRole>('customer');
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Sync profile and record login log in Supabase database
-  const recordLoginAndSyncProfile = async (
+  // Record login activity log only on explicit user sign-in/sign-up
+  const recordLoginLog = async (activeUser: User, email?: string | null) => {
+    try {
+      const now = new Date().toISOString();
+      await supabase.from('login_logs').insert({
+        user_id: activeUser.id,
+        email: email || activeUser.email || 'unknown',
+        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'web-browser',
+        logged_in_at: now,
+      });
+    } catch (logErr) {
+      console.warn('Login log recording note:', logErr);
+    }
+  };
+
+  // Sync or construct profile object safely without duplicate loop triggers
+  const syncProfileData = async (
     activeUser: User,
     metaOverrides?: { fullName?: string; phone?: string }
   ): Promise<Profile> => {
@@ -35,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const email = activeUser.email || null;
     const now = new Date().toISOString();
 
-    const profileData: Profile = {
+    const fallbackProfile: Profile = {
       id: activeUser.id,
       role: (meta.role as UserRole) || 'customer',
       full_name: fullName,
@@ -47,7 +62,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     try {
-      // 1. Upsert Profile into public.profiles
       const { data: savedProfile, error: upsertErr } = await supabase
         .from('profiles')
         .upsert(
@@ -56,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             full_name: fullName,
             email: email,
             phone: phone,
-            role: profileData.role,
+            role: fallbackProfile.role,
             last_login_at: now,
             updated_at: now,
           },
@@ -68,29 +82,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!upsertErr && savedProfile) {
         setProfile(savedProfile as Profile);
         setRole((savedProfile.role as UserRole) || 'customer');
+        return savedProfile as Profile;
       } else {
-        setProfile(profileData);
-        setRole(profileData.role);
+        setProfile(fallbackProfile);
+        setRole(fallbackProfile.role);
+        return fallbackProfile;
       }
     } catch (err) {
       console.warn('Profile sync note:', err);
-      setProfile(profileData);
-      setRole(profileData.role);
+      setProfile(fallbackProfile);
+      setRole(fallbackProfile.role);
+      return fallbackProfile;
     }
-
-    try {
-      // 2. Record login activity in public.login_logs
-      await supabase.from('login_logs').insert({
-        user_id: activeUser.id,
-        email: email || 'unknown',
-        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'web-browser',
-        logged_in_at: now,
-      });
-    } catch (logErr) {
-      console.warn('Login log recording note:', logErr);
-    }
-
-    return profileData;
   };
 
   const fetchProfile = async (userId: string, currentUser?: User | null) => {
@@ -105,13 +108,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(data as Profile);
         setRole((data.role as UserRole) || 'customer');
       } else if (currentUser) {
-        // Fallback and sync profile to database
-        await recordLoginAndSyncProfile(currentUser);
+        const meta = currentUser.user_metadata || {};
+        const fallback: Profile = {
+          id: currentUser.id,
+          role: (meta.role as UserRole) || 'customer',
+          full_name: meta.full_name || currentUser.email?.split('@')[0] || 'Valued Customer',
+          email: currentUser.email || null,
+          phone: meta.phone || null,
+          created_at: currentUser.created_at || new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        setProfile(fallback);
+        setRole(fallback.role);
       }
     } catch (err) {
       console.warn('Profile fetch note:', err);
       if (currentUser) {
-        await recordLoginAndSyncProfile(currentUser);
+        const meta = currentUser.user_metadata || {};
+        setProfile({
+          id: currentUser.id,
+          role: (meta.role as UserRole) || 'customer',
+          full_name: meta.full_name || currentUser.email?.split('@')[0] || 'Valued Customer',
+          email: currentUser.email || null,
+          phone: meta.phone || null,
+          created_at: currentUser.created_at || new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
       }
     }
   };
@@ -119,37 +141,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let isMounted = true;
 
-    // 1. Initial session check
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!isMounted) return;
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await fetchProfile(session.user.id, session.user);
-      }
-      if (isMounted) setIsLoading(false);
-    }).catch((err) => {
-      console.error('Error fetching Supabase session:', err);
-      if (isMounted) setIsLoading(false);
-    });
-
-    // 2. Listen for auth state changes (Sign In, Sign Out, Token Refresh)
+    // Single unified auth state listener (handles INITIAL_SESSION, SIGNED_IN, SIGNED_OUT, TOKEN_REFRESHED)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
       if (!isMounted) return;
       setSession(newSession);
       setUser(newSession?.user ?? null);
 
       if (newSession?.user) {
-        if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-          await recordLoginAndSyncProfile(newSession.user);
-        } else {
-          await fetchProfile(newSession.user.id, newSession.user);
-        }
+        await fetchProfile(newSession.user.id, newSession.user);
       } else {
         setProfile(null);
         setRole('customer');
       }
-      setIsLoading(false);
+      if (isMounted) setIsLoading(false);
     });
 
     return () => {
@@ -173,7 +177,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.session && data.user) {
         setSession(data.session);
         setUser(data.user);
-        await recordLoginAndSyncProfile(data.user);
+        await syncProfileData(data.user);
+        await recordLoginLog(data.user, email);
       }
 
       return { data, error: null };
@@ -205,7 +210,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.session && data.user) {
         setSession(data.session);
         setUser(data.user);
-        await recordLoginAndSyncProfile(data.user, { fullName, phone });
+        await syncProfileData(data.user, { fullName, phone });
+        await recordLoginLog(data.user, email);
       }
 
       return { data, error: null };

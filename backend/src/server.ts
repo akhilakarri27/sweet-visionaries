@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import { config } from './config/env.js';
 import apiRoutes from './routes/api.routes.js';
 
+// Kotaiah Sweets API Application
 const app = express();
 
 // Security Headers

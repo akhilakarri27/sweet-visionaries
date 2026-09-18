@@ -43,7 +43,7 @@ import {
   DEFAULT_TEMPTATION_VIDEOS,
   SweetVideoSlide,
   TemptationVideoCard,
-  getSiteSetting
+  getAllSiteSettings
 } from '../lib/storage';
 
 interface HomeProps {
@@ -168,7 +168,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
   const [contactSubmitted, setContactSubmitted] = useState<boolean>(false);
   const [contactForm, setContactForm] = useState({ name: '', phone: '', email: '', message: '' });
 
-  // Video Carousel Auto Rotation
+  // Video Carousel Auto Rotation (Clean timer lifecycle without rebuilding on every frame)
   useEffect(() => {
     if (sweetSlides.length <= 1) return;
     const timer = setInterval(() => {
@@ -176,67 +176,48 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
     }, 9000);
 
     return () => clearInterval(timer);
-  }, [sweetSlides.length, activeSlideIndex]);
+  }, [sweetSlides.length]);
 
   useEffect(() => {
+    let isMounted = true;
+
     const loadHomeData = async () => {
       try {
-        // 1. Fetch Dynamic Hero Video & Poster Settings
-        const [videoSetting, posterSetting, headingSetting, subheadingSetting, ctaSetting, slidesSetting, temptationSetting] = await Promise.all([
-          getSiteSetting<string>('hero_video_url', DEFAULT_HERO_VIDEO_URL),
-          getSiteSetting<string>('hero_poster_url', DEFAULT_HERO_POSTER_URL),
-          getSiteSetting<string>('hero_heading', DEFAULT_HERO_HEADING),
-          getSiteSetting<string>('hero_subheading', DEFAULT_HERO_SUBHEADING),
-          getSiteSetting<string>('hero_cta_text', DEFAULT_HERO_CTA_TEXT),
-          getSiteSetting<SweetVideoSlide[]>('hero_video_slides', DEFAULT_SWEET_VIDEO_SLIDES),
-          getSiteSetting<TemptationVideoCard[]>('temptation_videos', DEFAULT_TEMPTATION_VIDEOS),
+        // 1. Fetch Dynamic Hero Video & Poster Settings in a single batched query
+        const [settingsMap, { data: cats }, { data: prods }, { data: offs }, { data: revs }] = await Promise.all([
+          getAllSiteSettings(),
+          supabase.from('categories').select('*').eq('is_active', true).order('display_order'),
+          supabase.from('products').select('*, categories(name), product_images(*)').eq('is_available', true).order('rating', { ascending: false }),
+          supabase.from('offers').select('*').eq('is_active', true).limit(3),
+          supabase.from('reviews').select('*').eq('is_approved', true).limit(6),
         ]);
-        if (headingSetting) setHeroHeading(headingSetting);
-        if (subheadingSetting) setHeroSubheading(subheadingSetting);
-        if (ctaSetting) setHeroCtaText(ctaSetting);
-        if (slidesSetting && Array.isArray(slidesSetting) && slidesSetting.length > 0) {
-          setSweetSlides(slidesSetting);
-        } else if (videoSetting && videoSetting !== DEFAULT_HERO_VIDEO_URL) {
-          // If single custom hero video URL was provided in site_settings
-          setSweetSlides((prev) => [
-            {
-              ...prev[0],
-              videoUrl: videoSetting,
-              posterUrl: posterSetting || prev[0].posterUrl,
-            },
-            ...prev.slice(1),
-          ]);
-        }
-        if (temptationSetting && Array.isArray(temptationSetting) && temptationSetting.length > 0) {
-          setTemptationVideos(temptationSetting);
+
+        if (!isMounted) return;
+
+        if (settingsMap) {
+          if (settingsMap.hero_heading) setHeroHeading(settingsMap.hero_heading);
+          if (settingsMap.hero_subheading) setHeroSubheading(settingsMap.hero_subheading);
+          if (settingsMap.hero_cta_text) setHeroCtaText(settingsMap.hero_cta_text);
+          if (settingsMap.hero_video_slides && Array.isArray(settingsMap.hero_video_slides) && settingsMap.hero_video_slides.length > 0) {
+            setSweetSlides(settingsMap.hero_video_slides);
+          } else if (settingsMap.hero_video_url && settingsMap.hero_video_url !== DEFAULT_HERO_VIDEO_URL) {
+            setSweetSlides((prev) => [
+              {
+                ...prev[0],
+                videoUrl: settingsMap.hero_video_url,
+                posterUrl: settingsMap.hero_poster_url || prev[0].posterUrl,
+              },
+              ...prev.slice(1),
+            ]);
+          }
+          if (settingsMap.temptation_videos && Array.isArray(settingsMap.temptation_videos) && settingsMap.temptation_videos.length > 0) {
+            setTemptationVideos(settingsMap.temptation_videos);
+          }
         }
 
-        const { data: cats } = await supabase
-          .from('categories')
-          .select('*')
-          .eq('is_active', true)
-          .order('display_order');
         if (cats && cats.length > 0) setCategories(cats as Category[]);
-
-        const { data: prods } = await supabase
-          .from('products')
-          .select('*, categories(name), product_images(*)')
-          .eq('is_available', true)
-          .order('rating', { ascending: false });
         if (prods && prods.length > 0) setAllProducts(prods as Product[]);
-
-        const { data: offs } = await supabase
-          .from('offers')
-          .select('*')
-          .eq('is_active', true)
-          .limit(3);
         if (offs && offs.length > 0) setOffers(offs as Offer[]);
-
-        const { data: revs } = await supabase
-          .from('reviews')
-          .select('*')
-          .eq('is_approved', true)
-          .limit(6);
         if (revs && revs.length > 0) setReviews(revs as Review[]);
       } catch (err) {
         console.error('Home data load error:', err);
@@ -244,6 +225,10 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
     };
 
     loadHomeData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Featured Sweets (is_featured === true)

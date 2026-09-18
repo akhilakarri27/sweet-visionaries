@@ -140,10 +140,60 @@ export const DEFAULT_TEMPTATION_VIDEOS: TemptationVideoCard[] = [
   },
 ];
 
+let cachedSettings: Record<string, any> | null = null;
+let lastFetchTime = 0;
+const CACHE_TTL_MS = 60000; // 1 minute cache
+
+/**
+ * Fetch all dynamic site configurations in a single batched Supabase query
+ */
+export async function getAllSiteSettings(forceRefresh = false): Promise<Record<string, any>> {
+  const now = Date.now();
+  if (!forceRefresh && cachedSettings && (now - lastFetchTime < CACHE_TTL_MS)) {
+    return cachedSettings;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('key, value');
+
+    if (error || !data) {
+      return cachedSettings || {};
+    }
+
+    const settingsMap: Record<string, any> = {};
+    for (const item of data) {
+      let val = item.value;
+      if (typeof val === 'string') {
+        try {
+          val = JSON.parse(val);
+        } catch {
+          // If not JSON, use cleaned string
+          val = val.replace(/^"(.*)"$/, '$1');
+        }
+      }
+      settingsMap[item.key] = val;
+    }
+
+    cachedSettings = settingsMap;
+    lastFetchTime = now;
+    return settingsMap;
+  } catch (err) {
+    console.warn('Could not load site settings batch, using cache or defaults:', err);
+    return cachedSettings || {};
+  }
+}
+
 /**
  * Fetch dynamic site configuration from Supabase site_settings table
  */
 export async function getSiteSetting<T>(key: string, defaultValue: T): Promise<T> {
+  // Use cached batch settings if available
+  if (cachedSettings && cachedSettings[key] !== undefined) {
+    return cachedSettings[key] as T;
+  }
+
   try {
     const { data, error } = await supabase
       .from('site_settings')
@@ -155,13 +205,16 @@ export async function getSiteSetting<T>(key: string, defaultValue: T): Promise<T
       return defaultValue;
     }
 
-    if (typeof data.value === 'string') {
-      // Remove any surrounding quotes if stored as JSON string
-      const val = data.value.replace(/^"(.*)"$/, '$1');
-      return val as unknown as T;
+    let val = data.value;
+    if (typeof val === 'string') {
+      try {
+        val = JSON.parse(val);
+      } catch {
+        val = val.replace(/^"(.*)"$/, '$1');
+      }
     }
 
-    return data.value as T;
+    return (val ?? defaultValue) as T;
   } catch (err) {
     console.warn(`Could not load site setting '${key}', using default:`, err);
     return defaultValue;
@@ -186,6 +239,10 @@ export async function updateSiteSetting(key: string, value: any, description?: s
       console.error(`Error updating site setting ${key}:`, error);
       return { success: false, error: error.message };
     }
+
+    // Invalidate local memory cache immediately
+    cachedSettings = null;
+    lastFetchTime = 0;
 
     return { success: true };
   } catch (err: any) {
