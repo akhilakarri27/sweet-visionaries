@@ -54,17 +54,75 @@
 
 /* Glassmorphism Classes */
 .glass-panel {
-  background: rgba(255, 253, 249, 0.85);
+  background: rgba(255, 253, 249, 0.88);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(232, 223, 213, 0.8);
+  border: 1px solid rgba(232, 223, 213, 0.85);
 }
 
 .glass-dark {
-  background: rgba(28, 25, 23, 0.85);
+  background: rgba(28, 25, 23, 0.88);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(217, 119, 6, 0.2);
+}
+
+/* =========================================================
+   Traditional Indian Heritage Backgrounds & Delicate Patterns
+   (Ultra-subtle, <3.5% opacity, warm creamy ivory base)
+   ========================================================= */
+
+/* 1. Main Home Base Background - Warm Creamy Ivory with Subtle Jaali Lattice */
+.bg-heritage-ivory {
+  background-color: #FAF6EE;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(217, 119, 6, 0.025) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 0% 0%, rgba(136, 19, 55, 0.018) 1.5px, transparent 1.5px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+}
+
+/* 2. Delicate Floral Mandala Filigree Texture (For Categories & About) */
+.bg-heritage-mandala {
+  background-color: #FBF7F0;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23B45309' fill-opacity='0.028'%3E%3Cpath d='M40 40c0-7.732 6.268-14 14-14s14 6.268 14 14-6.268 14-14 14-14-6.268-14-14zm0 0c0-7.732-6.268-14-14-14s-14 6.268-14 14 6.268 14 14 14 14-6.268 14-14zm0-40c0 7.732 6.268 14 14 14s14-6.268 14-14-6.268-14-14-14-14 6.268-14 14zm0 0c0 7.732-6.268 14-14 14s-14-6.268-14-14 6.268-14 14-14 14 6.268 14 14zm0 80c0-7.732 6.268-14 14-14s14 6.268 14 14-6.268 14-14 14-14-6.268-14-14zm0 0c0-7.732-6.268-14-14-14s-14 6.268-14 14 6.268 14 14 14 14-6.268 14-14z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* 3. Pure Lighter Silky Cream (For Products & Reviews) */
+.bg-heritage-silky {
+  background-color: #FCF9F2;
+  background-image: radial-gradient(circle at 50% 0%, rgba(217, 119, 6, 0.03) 0%, transparent 70%);
+}
+
+/* 4. Warm Heritage Accent Tone (For Why Choose Us / Story) */
+.bg-heritage-warm {
+  background-color: #F8F3EA;
+  background-image: 
+    linear-gradient(135deg, rgba(217, 119, 6, 0.02) 25%, transparent 25%),
+    linear-gradient(225deg, rgba(217, 119, 6, 0.02) 25%, transparent 25%),
+    linear-gradient(45deg, rgba(217, 119, 6, 0.02) 25%, transparent 25%),
+    linear-gradient(315deg, rgba(217, 119, 6, 0.02) 25%, #F8F3EA 25%);
+  background-position: 16px 0, 16px 0, 0 0, 0 0;
+  background-size: 32px 32px;
+  background-repeat: repeat;
+}
+
+/* 5. Elegant Thin Golden Divider with Lotus/Diamond Accent */
+.ornamental-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.ornamental-divider::before,
+.ornamental-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(217, 119, 6, 0.28), transparent);
 }
 
 /* Accessibility: Reduced Motion Support */

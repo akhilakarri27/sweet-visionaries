@@ -253,7 +253,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
   };
 
   return (
-    <div className="space-y-16 sm:space-y-24">
+    <div className="bg-heritage-ivory min-h-screen space-y-16 sm:space-y-24 pb-16">
       
       {/* 1. HERO VIDEO SECTION */}
       <section className="relative w-full min-h-[85vh] lg:min-h-[92vh] flex items-center justify-center overflow-hidden bg-stone-950 border-b border-brand-gold/30">
@@ -284,6 +284,9 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
 
         {/* Subtle Warm Overlay for readability without dimming the sweets */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/60 pointer-events-none" />
+
+        {/* Soft Bottom Gradient Fade connecting Hero into warm ivory background */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-28 bg-gradient-to-t from-[#FAF6EE] to-transparent pointer-events-none z-10" />
 
         {/* Hero Content Area */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center space-y-7">
@@ -504,8 +507,13 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
         </div>
       </section>
 
+      {/* Ornamental Divider */}
+      <div className="ornamental-divider max-w-4xl px-4 opacity-50">
+        <span className="text-brand-gold text-xs">❖</span>
+      </div>
+
       {/* 3. CATEGORIES SECTION */}
-      <section id="categories" className="bg-brand-surface/60 py-16 border-y border-brand-border/80">
+      <section id="categories" className="bg-heritage-mandala py-16 border-y border-brand-gold/25 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="text-center max-w-2xl mx-auto space-y-2">
             <span className="text-xs font-bold text-brand-gold uppercase tracking-wider font-serif">
@@ -593,6 +601,11 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
           </div>
         </div>
       </section>
+
+      {/* Ornamental Divider */}
+      <div className="ornamental-divider max-w-4xl px-4 opacity-50">
+        <span className="text-brand-gold text-xs">❖</span>
+      </div>
 
       {/* 4. POPULAR & BESTSELLER PRODUCTS (FULL CATALOGUE WITH TABS) */}
       <section id="menu" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -748,9 +761,14 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
         </div>
       </section>
 
+      {/* Ornamental Divider */}
+      <div className="ornamental-divider max-w-4xl px-4 opacity-50">
+        <span className="text-brand-gold text-xs">❖</span>
+      </div>
+
       {/* 5. ABOUT / BRAND HERITAGE SECTION */}
       <section id="about" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center bg-[#FFFDF9] rounded-3xl border border-brand-border p-6 sm:p-10 shadow-soft">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center bg-[#FFFDF9] bg-heritage-mandala rounded-3xl border border-brand-gold/30 p-6 sm:p-10 shadow-soft">
           
           <div className="lg:col-span-7 space-y-4">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-gold uppercase tracking-wider font-serif">
@@ -802,7 +820,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
       </section>
 
       {/* 6. WHY CHOOSE US */}
-      <section id="why-choose-us" className="bg-brand-cream/50 py-16 border-y border-brand-border">
+      <section id="why-choose-us" className="bg-heritage-warm py-16 border-y border-brand-gold/25">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
             <span className="text-xs font-bold text-brand-gold uppercase tracking-wider font-serif">
@@ -859,6 +877,11 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
           </div>
         </div>
       </section>
+
+      {/* Ornamental Divider */}
+      <div className="ornamental-divider max-w-4xl px-4 opacity-50">
+        <span className="text-brand-gold text-xs">❖</span>
+      </div>
 
       {/* 7. CUSTOMER REVIEWS */}
       <section id="reviews" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -933,6 +956,11 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
         </div>
       </section>
 
+      {/* Ornamental Divider */}
+      <div className="ornamental-divider max-w-4xl px-4 opacity-50">
+        <span className="text-brand-gold text-xs">❖</span>
+      </div>
+
       {/* 8. AI ASSISTANT / RAG DISCOVERY SECTION */}
       {onOpenChatbot && (
         <section id="ai-assistant" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -984,6 +1012,11 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
         </section>
       )}
 
+      {/* Ornamental Divider */}
+      <div className="ornamental-divider max-w-4xl px-4 opacity-50">
+        <span className="text-brand-gold text-xs">❖</span>
+      </div>
+
       {/* 9. SPECIAL OFFERS SECTION */}
       <section id="offers" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-gradient-to-r from-brand-maroon via-brand-maroon-dark to-stone-900 rounded-3xl p-6 sm:p-10 border-2 border-brand-gold/50 shadow-float text-[#FFFDF9] relative overflow-hidden">
@@ -1023,7 +1056,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
       </section>
 
       {/* 10. STORE LOCATIONS & INQUIRY FORM */}
-      <section id="contact" className="bg-brand-surface py-16 border-t border-brand-border">
+      <section id="contact" className="bg-heritage-warm py-16 border-t border-brand-gold/25">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             
