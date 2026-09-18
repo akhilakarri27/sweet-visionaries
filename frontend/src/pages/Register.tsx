@@ -24,7 +24,14 @@ export const Register: React.FC = () => {
     try {
       const { data, error } = await signUp(email.trim(), password, fullName.trim(), phone.trim());
       if (error) {
-        setErrorMessage(error.message || 'Registration failed. Please check your details and try again.');
+        const msg = error.message || '';
+        if (msg.toLowerCase().includes('rate limit')) {
+          setErrorMessage('Supabase free tier email rate limit reached. Please disable "Confirm email" in Supabase Auth Settings (Providers -> Email) for instant registration without SMTP limits.');
+        } else if (msg.toLowerCase().includes('user already registered')) {
+          setErrorMessage('An account with this email already exists. Please proceed to Sign In.');
+        } else {
+          setErrorMessage(msg || 'Registration failed. Please check your details and try again.');
+        }
       } else if (data?.session) {
         // Active session created immediately
         navigate('/account');
@@ -32,7 +39,7 @@ export const Register: React.FC = () => {
         // User created, confirmation email sent or ready for sign in
         setSuccessInfo({
           title: 'Account Created Successfully! 🎉',
-          message: 'Welcome to Kotaiah Sweets! If email verification is enabled, please check your inbox to confirm, or proceed to sign in.',
+          message: 'Welcome to Kotaiah Sweets! Your profile is ready. If email verification is enabled on your Supabase project, check your inbox to confirm, or proceed to sign in.',
         });
       } else {
         navigate('/account');

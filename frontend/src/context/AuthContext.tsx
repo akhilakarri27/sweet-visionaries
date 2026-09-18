@@ -24,6 +24,75 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [role, setRole] = useState<UserRole>('customer');
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Sync profile and record login log in Supabase database
+  const recordLoginAndSyncProfile = async (
+    activeUser: User,
+    metaOverrides?: { fullName?: string; phone?: string }
+  ): Promise<Profile> => {
+    const meta = activeUser.user_metadata || {};
+    const fullName = metaOverrides?.fullName || meta.full_name || activeUser.email?.split('@')[0] || 'Valued Customer';
+    const phone = metaOverrides?.phone || meta.phone || null;
+    const email = activeUser.email || null;
+    const now = new Date().toISOString();
+
+    const profileData: Profile = {
+      id: activeUser.id,
+      role: (meta.role as UserRole) || 'customer',
+      full_name: fullName,
+      email: email,
+      phone: phone,
+      last_login_at: now,
+      created_at: activeUser.created_at || now,
+      updated_at: now,
+    };
+
+    try {
+      // 1. Upsert Profile into public.profiles
+      const { data: savedProfile, error: upsertErr } = await supabase
+        .from('profiles')
+        .upsert(
+          {
+            id: activeUser.id,
+            full_name: fullName,
+            email: email,
+            phone: phone,
+            role: profileData.role,
+            last_login_at: now,
+            updated_at: now,
+          },
+          { onConflict: 'id' }
+        )
+        .select()
+        .maybeSingle();
+
+      if (!upsertErr && savedProfile) {
+        setProfile(savedProfile as Profile);
+        setRole((savedProfile.role as UserRole) || 'customer');
+      } else {
+        setProfile(profileData);
+        setRole(profileData.role);
+      }
+    } catch (err) {
+      console.warn('Profile sync note:', err);
+      setProfile(profileData);
+      setRole(profileData.role);
+    }
+
+    try {
+      // 2. Record login activity in public.login_logs
+      await supabase.from('login_logs').insert({
+        user_id: activeUser.id,
+        email: email || 'unknown',
+        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'web-browser',
+        logged_in_at: now,
+      });
+    } catch (logErr) {
+      console.warn('Login log recording note:', logErr);
+    }
+
+    return profileData;
+  };
+
   const fetchProfile = async (userId: string, currentUser?: User | null) => {
     try {
       const { data, error } = await supabase
@@ -34,25 +103,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (!error && data) {
         setProfile(data as Profile);
-        setRole(data.role || 'customer');
-      } else {
-        // Fallback default profile from user metadata if table row is being provisioned
-        const activeUser = currentUser || user;
-        const metadata = activeUser?.user_metadata;
-        const defaultProf: Profile = {
-          id: userId,
-          role: 'customer',
-          full_name: metadata?.full_name || activeUser?.email?.split('@')[0] || 'Valued Customer',
-          email: activeUser?.email || null,
-          phone: metadata?.phone || null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-        setProfile(defaultProf);
-        setRole('customer');
+        setRole((data.role as UserRole) || 'customer');
+      } else if (currentUser) {
+        // Fallback and sync profile to database
+        await recordLoginAndSyncProfile(currentUser);
       }
     } catch (err) {
       console.warn('Profile fetch note:', err);
+      if (currentUser) {
+        await recordLoginAndSyncProfile(currentUser);
+      }
     }
   };
 
@@ -60,29 +120,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let isMounted = true;
 
     // 1. Initial session check
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!isMounted) return;
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id, session.user).finally(() => {
-          if (isMounted) setIsLoading(false);
-        });
-      } else {
-        setIsLoading(false);
+        await fetchProfile(session.user.id, session.user);
       }
+      if (isMounted) setIsLoading(false);
     }).catch((err) => {
       console.error('Error fetching Supabase session:', err);
       if (isMounted) setIsLoading(false);
     });
 
     // 2. Listen for auth state changes (Sign In, Sign Out, Token Refresh)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
       if (!isMounted) return;
       setSession(newSession);
       setUser(newSession?.user ?? null);
+
       if (newSession?.user) {
-        await fetchProfile(newSession.user.id, newSession.user);
+        if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+          await recordLoginAndSyncProfile(newSession.user);
+        } else {
+          await fetchProfile(newSession.user.id, newSession.user);
+        }
       } else {
         setProfile(null);
         setRole('customer');
@@ -108,12 +170,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { data: null, error };
       }
 
-      if (data.session) {
+      if (data.session && data.user) {
         setSession(data.session);
         setUser(data.user);
-        if (data.user) {
-          await fetchProfile(data.user.id, data.user);
-        }
+        await recordLoginAndSyncProfile(data.user);
       }
 
       return { data, error: null };
@@ -141,13 +201,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { data: null, error };
       }
 
-      // If user session is returned immediately
-      if (data.session) {
+      // If user session is returned immediately (e.g. auto-confirm enabled)
+      if (data.session && data.user) {
         setSession(data.session);
         setUser(data.user);
-        if (data.user) {
-          await fetchProfile(data.user.id, data.user);
-        }
+        await recordLoginAndSyncProfile(data.user, { fullName, phone });
       }
 
       return { data, error: null };

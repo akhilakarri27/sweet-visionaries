@@ -8,8 +8,17 @@ export interface Profile {
   email?: string | null;
   phone?: string | null;
   avatar_url?: string | null;
+  last_login_at?: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface LoginLog {
+  id: string;
+  user_id: string;
+  email?: string | null;
+  user_agent?: string | null;
+  logged_in_at: string;
 }
 
 export interface Shop {

@@ -1,8 +1,8 @@
 -- ====================================================================
--- KOTAIAH SWEETS - PRODUCTION SUPABASE AUTH & PROFILES SETUP
+-- KOTAIAH SWEETS - PRODUCTION SUPABASE AUTH & LOGIN STORAGE SETUP
 -- ====================================================================
 
--- 1. Create Profiles Table (Attached to Supabase auth.users)
+-- 1. Create or Update public.profiles Table
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     shop_id UUID REFERENCES public.shops(id) ON DELETE SET NULL,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Ensure columns exist if table was previously created with fewer columns
+-- Ensure all columns exist on profiles
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'email') THEN
@@ -36,7 +36,7 @@ BEGIN
     END IF;
 END $$;
 
--- 2. Create Login Logs Table
+-- 2. Create Login History / Logs Table for tracking all logins in database
 CREATE TABLE IF NOT EXISTS public.login_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -49,22 +49,23 @@ CREATE TABLE IF NOT EXISTS public.login_logs (
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.login_logs ENABLE ROW LEVEL SECURITY;
 
--- 4. Drop existing policies to avoid conflicts
+-- 4. Clean up old policies to avoid duplicates
 DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Admins can view all profiles" ON public.profiles;
-DROP POLICY IF EXISTS "Users can insert own login logs" ON public.login_logs;
+DROP POLICY IF EXISTS "Anyone can insert login log" ON public.login_logs;
 DROP POLICY IF EXISTS "Users can view own login logs" ON public.login_logs;
+DROP POLICY IF EXISTS "Users can insert own login logs" ON public.login_logs;
 
--- 5. Create Strict, Production-Grade RLS Policies
+-- 5. Strict & Production-Ready RLS Policies for Profiles
 -- Authenticated users can view their own profile
 CREATE POLICY "Users can view own profile"
 ON public.profiles FOR SELECT
 TO authenticated
 USING (auth.uid() = id);
 
--- Authenticated users can insert their own profile
+-- Authenticated users can insert their own profile (enables direct client upsert)
 CREATE POLICY "Users can insert own profile"
 ON public.profiles FOR INSERT
 TO authenticated
@@ -77,7 +78,8 @@ TO authenticated
 USING (auth.uid() = id)
 WITH CHECK (auth.uid() = id);
 
--- Authenticated users can record login logs
+-- 6. RLS Policies for Login Logs
+-- Authenticated users can record their login events
 CREATE POLICY "Users can insert own login logs"
 ON public.login_logs FOR INSERT
 TO authenticated
@@ -89,8 +91,8 @@ ON public.login_logs FOR SELECT
 TO authenticated
 USING (auth.uid() = user_id);
 
--- 6. Automatic Profile Creation Function (SECURITY DEFINER)
--- Runs automatically whenever a new user signs up in auth.users
+-- 7. Automatic PostgreSQL SECURITY DEFINER Trigger
+-- Automatically populates public.profiles on user creation in auth.users
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -127,7 +129,7 @@ BEGIN
 END;
 $$;
 
--- 7. Trigger on auth.users for Seamless Account Creation
+-- Attach trigger to auth.users
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 
 CREATE TRIGGER on_auth_user_created
@@ -135,7 +137,7 @@ AFTER INSERT ON auth.users
 FOR EACH ROW
 EXECUTE FUNCTION public.handle_new_user();
 
--- 8. Retroactive Backfill for any Existing Auth Users
+-- 8. Retroactive Backfill for All Existing Auth Users
 INSERT INTO public.profiles (id, full_name, email, phone, role, last_login_at)
 SELECT 
     u.id,

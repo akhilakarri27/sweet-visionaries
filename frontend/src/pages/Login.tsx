@@ -20,7 +20,16 @@ export const Login: React.FC = () => {
     try {
       const { data, error } = await signIn(email.trim(), password);
       if (error) {
-        setErrorMessage(error.message || 'Invalid email or password. Please try again.');
+        const msg = error.message || '';
+        if (msg.toLowerCase().includes('email not confirmed')) {
+          setErrorMessage('Your email is not confirmed yet. Please verify your email or disable "Confirm email" in Supabase Auth settings.');
+        } else if (msg.toLowerCase().includes('invalid login credentials') || msg.toLowerCase().includes('invalid_grant')) {
+          setErrorMessage('Invalid email or password. If you are a new customer, please click "Create Account" below to register.');
+        } else if (msg.toLowerCase().includes('rate limit')) {
+          setErrorMessage('Supabase email rate limit reached. Turn off "Confirm email" in Supabase Dashboard (Auth -> Providers -> Email) for instant access.');
+        } else {
+          setErrorMessage(msg || 'Invalid email or password. Please try again.');
+        }
       } else {
         navigate('/account');
       }
