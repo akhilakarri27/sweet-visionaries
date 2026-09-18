@@ -4,7 +4,7 @@ import { Product } from '../types/database';
 export const STORAGE_BUCKET = 'product-images';
 export const HERO_STORAGE_BUCKET = 'hero-videos';
 export const SWEET_VIDEOS_STORAGE_BUCKET = 'sweet-videos';
-export const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1599785209707-a456fc1337bb?w=800&q=80';
+export const DEFAULT_FALLBACK_IMAGE = '/sweets/kakinada-gottam-kaja.jpg';
 
 const SUPABASE_BASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://bunigrqjuvrenwgsodab.supabase.co';
 
@@ -325,9 +325,15 @@ export function getProductImageUrl(product?: Partial<Product> | null): string {
     return firstGallery.trim();
   }
 
-  // 3. If product slug exists, construct standard Supabase Storage URL
+  // 3. If product slug exists, check standard local / storage paths
   if (product.slug) {
-    return getSupabaseStorageUrl(product.slug);
+    const cleanSlug = product.slug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    return `/sweets/${cleanSlug}.jpg`;
+  }
+
+  if (product.name) {
+    const cleanSlug = product.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    return `/sweets/${cleanSlug}.jpg`;
   }
 
   return DEFAULT_FALLBACK_IMAGE;
