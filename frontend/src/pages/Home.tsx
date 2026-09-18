@@ -40,6 +40,90 @@ interface HomeProps {
   onToast?: (msg: string) => void;
 }
 
+interface HomepageCategoryCard {
+  name: string;
+  slug: string;
+  representativeSlug: string;
+  representativeName: string;
+  description: string;
+  count: number;
+}
+
+const EXACT_HOMEPAGE_CATEGORIES: HomepageCategoryCard[] = [
+  {
+    name: 'Kaja Varieties',
+    slug: 'kaja-varieties',
+    representativeSlug: 'madatha-kaja',
+    representativeName: 'Madatha Kaja',
+    description: 'Discover traditional Kakinada kaja varieties in different styles.',
+    count: 6,
+  },
+  {
+    name: 'Kaju & Dry Fruit Sweets',
+    slug: 'dry-fruit-sweets',
+    representativeSlug: 'kaju-barfi',
+    representativeName: 'Kaju Barfi',
+    description: 'Rich and premium sweets featuring cashew and dry-fruit flavours.',
+    count: 1,
+  },
+  {
+    name: 'Traditional Sweets',
+    slug: 'traditional-sweets',
+    representativeSlug: 'jangri',
+    representativeName: 'Jangri',
+    description: 'Classic Indian sweets and traditional Andhra favourites.',
+    count: 10,
+  },
+  {
+    name: 'Laddu Varieties',
+    slug: 'laddu-varieties',
+    representativeSlug: 'boondhi-laddu',
+    representativeName: 'Boondhi Laddu',
+    description: 'A selection of traditional laddu varieties for every occasion.',
+    count: 6,
+  },
+  {
+    name: 'Milk Sweets & Kalakand',
+    slug: 'milk-ghee-sweets',
+    representativeSlug: 'white-piece-kalakand',
+    representativeName: 'White Piece Kalakand',
+    description: 'Rich milk-based sweets and traditional kalakand varieties.',
+    count: 9,
+  },
+  {
+    name: 'Halwa Varieties',
+    slug: 'halwa-varieties',
+    representativeSlug: 'fruit-halwa',
+    representativeName: 'Fruit Halwa',
+    description: 'Traditional halwa varieties with rich flavours.',
+    count: 3,
+  },
+  {
+    name: 'Pootharekulu',
+    slug: 'pootharekulu',
+    representativeSlug: 'bellam-pootharekulu',
+    representativeName: 'Bellam Pootharekulu',
+    description: 'Delicate Andhra paper-thin sweet varieties.',
+    count: 4,
+  },
+  {
+    name: 'Savouries & Snacks',
+    slug: 'savouries-snacks',
+    representativeSlug: 'mixture',
+    representativeName: 'Mixture',
+    description: 'Crunchy and savoury favourites from the Kotaiah Sweets catalogue.',
+    count: 3,
+  },
+  {
+    name: 'Special Andhra Snacks',
+    slug: 'special-andhra-snacks',
+    representativeSlug: 'special-andhra-ribbon-murukku',
+    representativeName: 'Special Andhra Ribbon Murukku',
+    description: 'Traditional Andhra-style crunchy ribbon murukku.',
+    count: 1,
+  },
+];
+
 export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -435,34 +519,73 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-            {categories.map((cat) => {
-              const count = allProducts.filter((p) => p.category_id === cat.id).length;
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
+            {EXACT_HOMEPAGE_CATEGORIES.map((cat) => {
+              // Retrieve representative product from Supabase / products catalogue data
+              const repProduct = allProducts.find(
+                (p) =>
+                  p.slug === cat.representativeSlug ||
+                  p.name.toLowerCase().includes(cat.representativeName.toLowerCase())
+              );
+
+              // Get actual unique product image from database or catalogue asset
+              const repImageUrl = repProduct
+                ? getProductImageUrl(repProduct)
+                : `/sweets/${cat.representativeSlug}.jpg`;
+
+              // Match corresponding database category if available, else use slug
+              const matchingDbCat = categories.find(
+                (c) =>
+                  c.slug === cat.slug ||
+                  c.name.toLowerCase() === cat.name.toLowerCase() ||
+                  (cat.slug === 'kaja-varieties' && (c.slug === 'kaja-specials' || c.name.includes('Kaja'))) ||
+                  (cat.slug === 'halwa-varieties' && (c.slug === 'halwa-specials' || c.name.includes('Halwa'))) ||
+                  (cat.slug === 'savouries-snacks' && (c.slug === 'savouries-namkeen' || c.name.includes('Savouries')))
+              );
+
+              const categoryLink = matchingDbCat
+                ? `/products?category=${matchingDbCat.id}`
+                : `/products?category=${cat.slug}`;
+
+              const countText = `${cat.count} ${cat.count === 1 ? 'Delicacy' : 'Delicacies'}`;
+
               return (
                 <Link
-                  key={cat.id}
-                  to={`/products?category=${cat.id}`}
+                  key={cat.slug}
+                  to={categoryLink}
                   className="group bg-[#FFFDF9] rounded-2xl border border-brand-border/80 overflow-hidden shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 text-center"
                 >
-                  <div className="relative w-full h-32 overflow-hidden bg-brand-surface">
+                  <div className="relative w-full h-36 overflow-hidden bg-brand-surface">
                     <img
-                      src={cat.image_url || DEFAULT_FALLBACK_IMAGE}
+                      src={repImageUrl}
                       alt={cat.name}
+                      loading="lazy"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = `/sweets/${cat.representativeSlug}.jpg`;
+                      }}
                       className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
                   </div>
 
-                  <div className="p-3.5 space-y-1">
-                    <h3 className="font-serif font-bold text-sm text-brand-charcoal group-hover:text-brand-gold transition-colors line-clamp-1">
-                      {cat.name}
-                    </h3>
-                    <p className="text-[10px] text-stone-500 line-clamp-1">
-                      {cat.description || 'Authentic traditional recipe'}
-                    </p>
-                    <span className="inline-block text-[10px] font-bold text-brand-maroon bg-brand-cream px-2 py-0.5 rounded-full mt-1">
-                      {count > 0 ? `${count} Delicacies` : 'Browse Menu'}
-                    </span>
+                  <div className="p-4 space-y-1.5 flex flex-col justify-between flex-1">
+                    <div>
+                      <h3 className="font-serif font-bold text-sm text-brand-charcoal group-hover:text-brand-gold transition-colors line-clamp-1">
+                        {cat.name}
+                      </h3>
+                      <p className="text-[11px] text-stone-500 line-clamp-2 leading-relaxed mt-1">
+                        {cat.description}
+                      </p>
+                    </div>
+                    <div className="pt-2 flex items-center justify-between border-t border-brand-border/50 mt-2">
+                      <span className="inline-block text-[10px] font-bold text-brand-maroon bg-brand-cream px-2.5 py-0.5 rounded-full">
+                        {countText}
+                      </span>
+                      <span className="text-[11px] font-bold text-brand-gold group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
+                        <span>Browse</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
                   </div>
                 </Link>
               );

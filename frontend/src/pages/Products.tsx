@@ -81,7 +81,43 @@ export const Products: React.FC<ProductsPageProps> = ({ onToast, onOpenChatbot }
 
     // Category filter
     if (selectedCategory) {
-      list = list.filter((p) => p.category_id === selectedCategory);
+      list = list.filter((p) => {
+        if (p.category_id === selectedCategory) return true;
+        if (p.categories?.id === selectedCategory) return true;
+        if (p.categories?.slug === selectedCategory) return true;
+        if (p.categories?.name?.toLowerCase() === selectedCategory.toLowerCase()) return true;
+
+        // Specific mappings for the 9 verified categories
+        if (selectedCategory === 'kaja-varieties' || selectedCategory === 'kaja-specials') {
+          return ['kakinada-gottam-kaja', 'ghee-kaja', 'madatha-kaja', 'baby-madatha-kaja', 'baby-gottam-kaja', 'paneer-kaja'].includes(p.slug);
+        }
+        if (selectedCategory === 'dry-fruit-sweets' || selectedCategory === 'kaju-dry-fruit-sweets') {
+          return ['kaju-barfi'].includes(p.slug);
+        }
+        if (selectedCategory === 'traditional-sweets') {
+          return ['gulab-jamun', 'jangri', 'paneer-jalebi', 'sunnundalu', 'bobbatlu', 'bellam-gavvalu', 'malai-puri', 'white-rasakanda', 'white-angoor', 'brown-angoor'].includes(p.slug);
+        }
+        if (selectedCategory === 'laddu-varieties') {
+          return ['boondhi-laddu', 'mothi-laddu', 'besan-laddu', 'dry-fruit-laddu', 'thokkudu-laddu', 'balaji-laddu'].includes(p.slug);
+        }
+        if (selectedCategory === 'milk-ghee-sweets' || selectedCategory === 'milk-sweets-kalakand') {
+          return ['mysore-pak', 'milk-mysore-pak', 'ongole-mysore-pak', 'pala-kova', 'white-piece-kalakand', 'karjur-kalakand', 'horlicks-kalakand', 'vanilla-icecream-burfi', 'badam-icecream-burfi'].includes(p.slug);
+        }
+        if (selectedCategory === 'halwa-varieties' || selectedCategory === 'halwa-specials') {
+          return ['fruit-halwa', 'red-halwa', 'dry-fruit-halwa'].includes(p.slug);
+        }
+        if (selectedCategory === 'pootharekulu') {
+          return ['bellam-pootharekulu', 'sugar-pootharekulu', 'dry-fruit-bellam-pootharekulu', 'dry-fruit-sugar-pootharekulu'].includes(p.slug);
+        }
+        if (selectedCategory === 'savouries-snacks' || selectedCategory === 'savouries-namkeen') {
+          return ['mixture', 'palli-pakodi', 'agra-mixture'].includes(p.slug);
+        }
+        if (selectedCategory === 'special-andhra-snacks') {
+          return ['special-andhra-ribbon-murukku'].includes(p.slug);
+        }
+
+        return false;
+      });
     }
 
     // Max Price filter
