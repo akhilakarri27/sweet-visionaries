@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Sparkles,
@@ -8,6 +8,7 @@ import {
   Award,
   Heart,
   ChevronRight,
+  ChevronLeft,
   Clock,
   MapPin,
   Star,
@@ -20,6 +21,9 @@ import {
   Send,
   Phone,
   Mail,
+  Play,
+  Pause,
+  Film,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Category, Product, Offer, Review } from '../types/database';
@@ -32,6 +36,13 @@ import {
   DEFAULT_FALLBACK_IMAGE,
   DEFAULT_HERO_VIDEO_URL,
   DEFAULT_HERO_POSTER_URL,
+  DEFAULT_HERO_HEADING,
+  DEFAULT_HERO_SUBHEADING,
+  DEFAULT_HERO_CTA_TEXT,
+  DEFAULT_SWEET_VIDEO_SLIDES,
+  DEFAULT_TEMPTATION_VIDEOS,
+  SweetVideoSlide,
+  TemptationVideoCard,
   getSiteSetting
 } from '../lib/storage';
 
@@ -135,12 +146,17 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
 
-  // Hero Settings loaded from Supabase site_settings
-  const [heroVideoUrl, setHeroVideoUrl] = useState<string>(DEFAULT_HERO_VIDEO_URL);
-  const [heroPosterUrl, setHeroPosterUrl] = useState<string>(DEFAULT_HERO_POSTER_URL);
-  const [heroHeading, setHeroHeading] = useState<string>('Kotaiah Sweets');
-  const [heroSubheading, setHeroSubheading] = useState<string>('Traditional Taste, Made for Every Celebration');
-  const [heroCtaText, setHeroCtaText] = useState<string>('Explore Sweets');
+  // Video Carousel Slides & Temptation Cards
+  const [sweetSlides, setSweetSlides] = useState<SweetVideoSlide[]>(DEFAULT_SWEET_VIDEO_SLIDES);
+  const [activeSlideIndex, setActiveSlideIndex] = useState<number>(0);
+  const [temptationVideos, setTemptationVideos] = useState<TemptationVideoCard[]>(DEFAULT_TEMPTATION_VIDEOS);
+  const [activePlayingTemptation, setActivePlayingTemptation] = useState<string | null>(null);
+
+  // Hero Headlines & CTA
+  const [heroHeading, setHeroHeading] = useState<string>(DEFAULT_HERO_HEADING);
+  const [heroSubheading, setHeroSubheading] = useState<string>(DEFAULT_HERO_SUBHEADING);
+  const [heroCtaText, setHeroCtaText] = useState<string>(DEFAULT_HERO_CTA_TEXT);
+  const [heroVideoError, setHeroVideoError] = useState<boolean>(false);
   
   // Quick View Modal State
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
@@ -152,22 +168,48 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
   const [contactSubmitted, setContactSubmitted] = useState<boolean>(false);
   const [contactForm, setContactForm] = useState({ name: '', phone: '', email: '', message: '' });
 
+  // Video Carousel Auto Rotation
+  useEffect(() => {
+    if (sweetSlides.length <= 1) return;
+    const timer = setInterval(() => {
+      setActiveSlideIndex((prev) => (prev + 1) % sweetSlides.length);
+    }, 9000);
+
+    return () => clearInterval(timer);
+  }, [sweetSlides.length, activeSlideIndex]);
+
   useEffect(() => {
     const loadHomeData = async () => {
       try {
         // 1. Fetch Dynamic Hero Video & Poster Settings
-        const [videoSetting, posterSetting, headingSetting, subheadingSetting, ctaSetting] = await Promise.all([
+        const [videoSetting, posterSetting, headingSetting, subheadingSetting, ctaSetting, slidesSetting, temptationSetting] = await Promise.all([
           getSiteSetting<string>('hero_video_url', DEFAULT_HERO_VIDEO_URL),
           getSiteSetting<string>('hero_poster_url', DEFAULT_HERO_POSTER_URL),
-          getSiteSetting<string>('hero_heading', 'Kotaiah Sweets'),
-          getSiteSetting<string>('hero_subheading', 'Traditional Taste, Made for Every Celebration'),
-          getSiteSetting<string>('hero_cta_text', 'Explore Sweets'),
+          getSiteSetting<string>('hero_heading', DEFAULT_HERO_HEADING),
+          getSiteSetting<string>('hero_subheading', DEFAULT_HERO_SUBHEADING),
+          getSiteSetting<string>('hero_cta_text', DEFAULT_HERO_CTA_TEXT),
+          getSiteSetting<SweetVideoSlide[]>('hero_video_slides', DEFAULT_SWEET_VIDEO_SLIDES),
+          getSiteSetting<TemptationVideoCard[]>('temptation_videos', DEFAULT_TEMPTATION_VIDEOS),
         ]);
-        if (videoSetting) setHeroVideoUrl(videoSetting);
-        if (posterSetting) setHeroPosterUrl(posterSetting);
         if (headingSetting) setHeroHeading(headingSetting);
         if (subheadingSetting) setHeroSubheading(subheadingSetting);
         if (ctaSetting) setHeroCtaText(ctaSetting);
+        if (slidesSetting && Array.isArray(slidesSetting) && slidesSetting.length > 0) {
+          setSweetSlides(slidesSetting);
+        } else if (videoSetting && videoSetting !== DEFAULT_HERO_VIDEO_URL) {
+          // If single custom hero video URL was provided in site_settings
+          setSweetSlides((prev) => [
+            {
+              ...prev[0],
+              videoUrl: videoSetting,
+              posterUrl: posterSetting || prev[0].posterUrl,
+            },
+            ...prev.slice(1),
+          ]);
+        }
+        if (temptationSetting && Array.isArray(temptationSetting) && temptationSetting.length > 0) {
+          setTemptationVideos(temptationSetting);
+        }
 
         const { data: cats } = await supabase
           .from('categories')
@@ -255,114 +297,172 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
   return (
     <div className="bg-heritage-ivory min-h-screen space-y-16 sm:space-y-24 pb-16 text-brand-charcoal">
       
-      {/* 1. HERO VIDEO SECTION */}
-      <section className="relative w-full min-h-[85vh] lg:min-h-[92vh] flex items-center justify-center overflow-hidden bg-stone-950 border-b border-brand-gold/30">
-        
-        {/* Background Video Player */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <video
-            key={heroVideoUrl}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster={heroPosterUrl}
-            className="hero-bg-video absolute inset-0 w-full h-full object-cover object-center scale-[1.02] transform transition-transform duration-1000"
-            aria-hidden="true"
-          >
-            <source src={heroVideoUrl} type="video/mp4" />
-          </video>
+      {/* 1. HERO VIDEO CAROUSEL SECTION */}
+      {(() => {
+        const currentSlide = sweetSlides[activeSlideIndex] || sweetSlides[0] || DEFAULT_SWEET_VIDEO_SLIDES[0];
 
-          {/* Reduced-motion & loading poster fallback */}
-          <img
-            src={heroPosterUrl}
-            alt="Kotaiah Sweets Authentic Delicacies"
-            className="hero-poster-fallback hidden absolute inset-0 w-full h-full object-cover object-center"
-          />
-        </div>
-
-        {/* Subtle Warm Overlay for readability without dimming the sweets */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/60 pointer-events-none" />
-
-        {/* Soft Bottom Gradient Fade connecting Hero into page background (#FFF9F5) */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-28 bg-gradient-to-t from-[#FFF9F5] to-transparent pointer-events-none z-10" />
-
-        {/* Hero Content Area */}
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center space-y-7">
-          
-          {/* Heritage Pill Badge */}
-          <div className="inline-flex items-center gap-2 bg-brand-primary border border-brand-gold/60 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-white shadow-primary">
-            <Sparkles className="w-4 h-4 text-brand-gold-light animate-spin-slow" />
-            <span>Master Artisans of Authentic Andhra Sweets • Since 1900</span>
-          </div>
-
-          {/* Headline and Tagline */}
-          <div className="space-y-3">
-            <h1 className="font-serif font-black text-4xl sm:text-6xl lg:text-7xl text-[#FFFFFF] tracking-tight leading-[1.1] drop-shadow-lg">
-              {heroHeading}
-            </h1>
-            <p className="font-serif italic text-lg sm:text-2xl lg:text-3xl text-brand-gold-light drop-shadow font-medium">
-              "{heroSubheading}"
-            </p>
-          </div>
-
-          {/* Narrative Summary */}
-          <p className="text-sm sm:text-base text-stone-200 max-w-2xl leading-relaxed font-sans mx-auto drop-shadow">
-            Taste the world-renowned <strong>Kakinada Gottam Kaja</strong>, <strong>Nethi Kaja</strong>, <strong>Atreyapuram Pootharekulu</strong>, <strong>Royal Mysore Pak</strong>, and handcrafted savouries made with 100% pure desi cow ghee.
-          </p>
-
-          {/* Action CTA Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
-            <a
-              href="#menu"
-              className="flex items-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white px-8 py-4 rounded-full font-black text-sm tracking-wide shadow-primary hover:scale-105 transition-all cursor-pointer"
-            >
-              <span>{heroCtaText}</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
-
-            <Link
-              to="/products"
-              className="flex items-center gap-2 bg-[#241B18]/90 hover:bg-[#241B18] text-[#FFFFFF] border border-brand-gold/60 px-8 py-4 rounded-full font-bold text-sm shadow-soft hover:scale-105 transition-all backdrop-blur-md"
-            >
-              <ShoppingBag className="w-4 h-4 text-brand-gold-light" />
-              <span>Order Now</span>
-            </Link>
-
-            {onOpenChatbot && (
-              <button
-                onClick={onOpenChatbot}
-                className="flex items-center gap-2 bg-white/15 hover:bg-white/25 text-white border border-white/30 px-6 py-4 rounded-full font-bold text-xs shadow-soft hover:scale-105 transition-all backdrop-blur-md"
+        return (
+          <section className="relative w-full h-[460px] sm:h-[520px] lg:h-[600px] flex items-center justify-start overflow-hidden bg-stone-950 border-b border-brand-gold/30">
+            
+            {/* Background Video Player Layer */}
+            <div className="absolute inset-0 w-full h-full overflow-hidden">
+              <video
+                key={currentSlide.videoUrl}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                poster={currentSlide.posterUrl}
+                onError={() => setHeroVideoError(true)}
+                onEnded={() => setActiveSlideIndex((prev) => (prev + 1) % sweetSlides.length)}
+                className="hero-bg-video absolute inset-0 w-full h-full object-cover object-center scale-[1.01] transform transition-all duration-700"
+                aria-hidden="true"
               >
-                <Sparkles className="w-4 h-4 text-brand-gold-light" />
-                <span>Ask AI Assistant</span>
-              </button>
+                <source src={currentSlide.videoUrl} type="video/mp4" />
+                <source src={DEFAULT_HERO_VIDEO_URL} type="video/mp4" />
+              </video>
+
+              {/* Reduced-motion & loading poster fallback */}
+              <img
+                src={currentSlide.posterUrl}
+                alt={currentSlide.title || "Kotaiah Sweets Traditional Indian Sweets"}
+                className={`hero-poster-fallback absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500 ${
+                  heroVideoError ? 'opacity-100 z-1' : 'hidden'
+                }`}
+              />
+            </div>
+
+            {/* Modern Food-Ordering Gradient Overlay (Left to Right) */}
+            <div 
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: 'linear-gradient(90deg, rgba(36, 28, 24, 0.82) 0%, rgba(36, 28, 24, 0.45) 55%, rgba(36, 28, 24, 0.12) 100%)'
+              }}
+            />
+
+            {/* Vertical Vignette for Mobile & Edge Softness */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40 pointer-events-none" />
+
+            {/* Bottom Gradient Fade connecting Hero seamlessly into Page Background (#FFF9F5) */}
+            <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-24 bg-gradient-to-t from-[#FFF9F5] to-transparent pointer-events-none z-10" />
+
+            {/* Main Food-Ordering Hero Content */}
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+              <div className="max-w-2xl text-left space-y-4 sm:space-y-6">
+                
+                {/* Active Sweet Pill Badge */}
+                <div className="inline-flex items-center gap-2 bg-brand-primary/95 text-white border border-brand-gold/60 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-bold shadow-primary">
+                  <Sparkles className="w-3.5 h-3.5 text-brand-gold-light animate-spin-slow" />
+                  <span className="tracking-wide">
+                    {currentSlide.tag || 'Signature Sweet'}: {currentSlide.title}
+                  </span>
+                  {currentSlide.priceText && (
+                    <span className="bg-black/30 px-2 py-0.5 rounded-full text-[10px] text-brand-gold-light font-extrabold ml-1">
+                      {currentSlide.priceText}
+                    </span>
+                  )}
+                </div>
+
+                {/* Primary Hero Headlines */}
+                <div className="space-y-2">
+                  <h1 className="font-serif font-black text-3xl sm:text-5xl lg:text-6xl text-[#FFFFFF] tracking-tight leading-[1.15] drop-shadow-md">
+                    Fresh Sweets. <br className="hidden sm:inline" />
+                    <span className="text-brand-gold-light">Traditional Taste.</span>
+                  </h1>
+                  <p className="text-xs sm:text-sm md:text-base text-stone-200 line-clamp-2 sm:line-clamp-3 leading-relaxed font-sans max-w-xl drop-shadow">
+                    {currentSlide.subtitle || 'Experience the world-renowned Kakinada Gottam Kaja, Atreyapuram Pootharekulu, and authentic pure desi cow ghee sweets.'}
+                  </p>
+                </div>
+
+                {/* Main Action CTAs */}
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <a
+                    href="#menu"
+                    className="flex items-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white px-7 sm:px-9 py-3.5 sm:py-4 rounded-full font-black text-xs sm:text-sm tracking-wider shadow-primary hover:scale-105 transition-all cursor-pointer"
+                  >
+                    <span>{heroCtaText || 'ORDER NOW'}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+
+                  <Link
+                    to="/products"
+                    className="flex items-center gap-2 bg-white/15 hover:bg-white/25 text-white border border-white/30 backdrop-blur-md px-6 py-3.5 sm:py-4 rounded-full font-bold text-xs sm:text-sm shadow-soft hover:scale-105 transition-all"
+                  >
+                    <ShoppingBag className="w-4 h-4 text-brand-gold-light" />
+                    <span>View Menu</span>
+                  </Link>
+
+                  {onOpenChatbot && (
+                    <button
+                      onClick={onOpenChatbot}
+                      className="hidden sm:flex items-center gap-1.5 bg-black/40 hover:bg-black/60 text-stone-300 hover:text-white border border-white/20 backdrop-blur-md px-4 py-3.5 rounded-full font-semibold text-xs shadow-soft transition-all"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-brand-gold-light" />
+                      <span>Ask AI</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Trust Badges */}
+                <div className="flex items-center gap-6 pt-2 text-[11px] sm:text-xs text-stone-300 font-medium">
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-brand-gold-light" />
+                    <span>100% Desi Cow Ghee</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-brand-gold-light" />
+                    <span>Fresh Daily Batches</span>
+                  </div>
+                  <div className="hidden sm:flex items-center gap-1.5">
+                    <Award className="w-3.5 h-3.5 text-brand-gold-light" />
+                    <span>Since 1900</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Video Carousel Indicators & Controls */}
+            {sweetSlides.length > 1 && (
+              <div className="absolute bottom-6 sm:bottom-8 right-4 sm:right-8 z-20 flex items-center gap-2 bg-black/50 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20">
+                <button
+                  onClick={() => setActiveSlideIndex((prev) => (prev - 1 + sweetSlides.length) % sweetSlides.length)}
+                  className="text-stone-300 hover:text-white p-1 transition-colors"
+                  title="Previous sweet video"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                <div className="flex items-center gap-1.5 px-1">
+                  {sweetSlides.map((slide, idx) => (
+                    <button
+                      key={slide.id || idx}
+                      onClick={() => setActiveSlideIndex(idx)}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        activeSlideIndex === idx
+                          ? 'w-6 bg-brand-primary shadow-xs'
+                          : 'w-2 bg-white/40 hover:bg-white/70'
+                      }`}
+                      title={slide.title}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setActiveSlideIndex((prev) => (prev + 1) % sweetSlides.length)}
+                  className="text-stone-300 hover:text-white p-1 transition-colors"
+                  title="Next sweet video"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             )}
-          </div>
 
-          {/* Trust Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 border-t border-white/20 max-w-3xl mx-auto">
-            <div className="bg-black/40 backdrop-blur-xs p-3.5 rounded-2xl border border-white/10 text-center">
-              <div className="font-serif font-black text-xl sm:text-2xl text-brand-gold-light">120+</div>
-              <div className="text-[11px] text-stone-300 font-medium">Years Heritage</div>
-            </div>
-            <div className="bg-black/40 backdrop-blur-xs p-3.5 rounded-2xl border border-white/10 text-center">
-              <div className="font-serif font-black text-xl sm:text-2xl text-brand-gold-light">100%</div>
-              <div className="text-[11px] text-stone-300 font-medium">Pure Desi Cow Ghee</div>
-            </div>
-            <div className="bg-black/40 backdrop-blur-xs p-3.5 rounded-2xl border border-white/10 text-center">
-              <div className="font-serif font-black text-xl sm:text-2xl text-brand-gold-light">4.9 ★</div>
-              <div className="text-[11px] text-stone-300 font-medium">1,200+ Reviews</div>
-            </div>
-            <div className="bg-black/40 backdrop-blur-xs p-3.5 rounded-2xl border border-white/10 text-center">
-              <div className="font-serif font-black text-xl sm:text-2xl text-brand-gold-light">Fresh</div>
-              <div className="text-[11px] text-stone-300 font-medium">Daily Pure Batches</div>
-            </div>
-          </div>
+          </section>
+        );
+      })()}
 
-        </div>
-      </section>
 
       {/* 2. FEATURED SWEETS (SIGNATURE COLLECTION) */}
       <section id="featured" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -754,6 +854,117 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                     <span>View & Order</span>
                     <ArrowRight className="w-3 h-3" />
                   </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Ornamental Divider */}
+      <div className="ornamental-divider max-w-4xl px-4 opacity-50">
+        <span className="text-brand-gold text-xs">❖</span>
+      </div>
+
+      {/* 4.5. MADE TO TEMPT YOU - FOOD VIDEO SHOWCASE SECTION */}
+      <section id="made-to-tempt-you" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-primary uppercase tracking-wider bg-brand-light-orange px-3.5 py-1 rounded-full border border-brand-border">
+            <Film className="w-3.5 h-3.5 text-brand-primary" />
+            <span>Fresh From The Sweet Kitchen</span>
+          </div>
+          <h2 className="font-serif font-black text-3xl sm:text-4xl text-brand-charcoal">
+            Made to Tempt You
+          </h2>
+          <p className="text-xs sm:text-sm text-brand-muted font-sans">
+            Watch our master sweet artisans handcraft golden Kaja, melt-in-mouth Laddus, and crisp Pootharekulu in pure country ghee.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {temptationVideos.map((item) => {
+            const matchedProduct = allProducts.find(
+              (p) => p.slug === item.slug || p.name.toLowerCase().includes(item.name.toLowerCase())
+            );
+
+            return (
+              <div
+                key={item.id}
+                className="group bg-white rounded-2xl border border-[#F0E5DC] overflow-hidden shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between hover:-translate-y-1"
+              >
+                {/* Video / Poster Showcase with Rounded Top */}
+                <div className="relative w-full h-52 overflow-hidden bg-stone-900 rounded-t-2xl">
+                  <video
+                    src={item.videoUrl}
+                    poster={item.posterUrl}
+                    muted
+                    loop
+                    playsInline
+                    autoPlay
+                    preload="metadata"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                    aria-label={`Video of ${item.name}`}
+                  >
+                    <source src={item.videoUrl} type="video/mp4" />
+                    <source src={DEFAULT_HERO_VIDEO_URL} type="video/mp4" />
+                  </video>
+
+                  {/* Fallback image */}
+                  <img
+                    src={item.posterUrl}
+                    alt={item.name}
+                    className="hero-poster-fallback hidden absolute inset-0 w-full h-full object-cover object-center"
+                  />
+
+                  {/* Top Badge: Category */}
+                  <div className="absolute top-3 left-3">
+                    <span className="bg-black/60 backdrop-blur-md text-brand-gold-light text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full border border-white/20">
+                      {item.category}
+                    </span>
+                  </div>
+
+                  {/* Bottom Video Badge */}
+                  <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-xs text-white text-[10px] px-2 py-0.5 rounded-md flex items-center gap-1 font-sans">
+                    <Play className="w-2.5 h-2.5 fill-current text-brand-primary" />
+                    <span>Sweetcraft</span>
+                  </div>
+                </div>
+
+                {/* Card Details & Quick Order Action */}
+                <div className="p-4 space-y-2 flex flex-col justify-between flex-1">
+                  <div>
+                    <h3 className="font-serif font-bold text-base text-brand-charcoal group-hover:text-brand-primary transition-colors line-clamp-1">
+                      {item.name}
+                    </h3>
+                    <p className="text-xs text-brand-muted line-clamp-2 mt-0.5 leading-relaxed">
+                      {item.tasteNote}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-brand-border/60 flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-stone-400 block">Pure Ghee Price:</span>
+                      <span className="font-serif font-black text-base text-brand-primary">
+                        ₹{item.price}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        if (matchedProduct) {
+                          setQuickViewProduct(matchedProduct);
+                          setModalWeight(matchedProduct.weight || '500g');
+                          setModalQuantity(1);
+                        } else {
+                          navigate('/products');
+                        }
+                      }}
+                      className="flex items-center gap-1.5 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-xs"
+                    >
+                      <ShoppingBag className="w-3.5 h-3.5" />
+                      <span>Order Delicacy</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             );

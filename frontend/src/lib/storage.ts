@@ -3,14 +3,142 @@ import { Product } from '../types/database';
 
 export const STORAGE_BUCKET = 'product-images';
 export const HERO_STORAGE_BUCKET = 'hero-videos';
+export const SWEET_VIDEOS_STORAGE_BUCKET = 'sweet-videos';
 export const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1599785209707-a456fc1337bb?w=800&q=80';
 
+const SUPABASE_BASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://bunigrqjuvrenwgsodab.supabase.co';
+
 // Default Supabase Storage URL for Hero Video and Poster
-export const DEFAULT_HERO_VIDEO_URL = `${import.meta.env.VITE_SUPABASE_URL || 'https://bunigrqjuvrenwgsodab.supabase.co'}/storage/v1/object/public/hero-videos/kotaiah-sweets-hero.mp4`;
+export const DEFAULT_HERO_VIDEO_URL = `${SUPABASE_BASE_URL}/storage/v1/object/public/hero-videos/kotaiah-sweets-hero.mp4`;
 export const DEFAULT_HERO_POSTER_URL = '/sweets/kakinada-gottam-kaja.jpg';
-export const DEFAULT_HERO_HEADING = 'Kotaiah Sweets';
-export const DEFAULT_HERO_SUBHEADING = 'Traditional Taste, Made for Every Celebration';
-export const DEFAULT_HERO_CTA_TEXT = 'Explore Sweets';
+export const DEFAULT_HERO_HEADING = 'Fresh Sweets. Traditional Taste.';
+export const DEFAULT_HERO_SUBHEADING = 'Original Kakinada Gottam Kaja & Pure Desi Cow Ghee Delicacies Since 1900';
+export const DEFAULT_HERO_CTA_TEXT = 'ORDER NOW';
+
+export interface SweetVideoSlide {
+  id: string;
+  title: string;
+  subtitle: string;
+  tag: string;
+  videoUrl: string;
+  posterUrl: string;
+  ctaText: string;
+  ctaLink: string;
+  priceText?: string;
+}
+
+export const DEFAULT_SWEET_VIDEO_SLIDES: SweetVideoSlide[] = [
+  {
+    id: 'kaja-slide',
+    title: 'Kakinada Gottam Kaja',
+    subtitle: 'Crisp golden crust oozing with warm cardamom sugar nectar in pure desi ghee.',
+    tag: 'Signature Heritage',
+    videoUrl: `${SUPABASE_BASE_URL}/storage/v1/object/public/sweet-videos/kaja-video.mp4`,
+    posterUrl: '/sweets/kakinada-gottam-kaja.jpg',
+    ctaText: 'ORDER NOW',
+    ctaLink: '/products?category=b1000000-0000-0000-0000-000000000001',
+    priceText: 'From ₹240',
+  },
+  {
+    id: 'laddu-slide',
+    title: 'Pure Ghee Motichoor Laddu',
+    subtitle: 'Melt-in-mouth golden boondi pearls infused with saffron and crunchy cashew nuts.',
+    tag: 'Festive Delight',
+    videoUrl: `${SUPABASE_BASE_URL}/storage/v1/object/public/sweet-videos/laddu-video.mp4`,
+    posterUrl: '/sweets/mothi-laddu.jpg',
+    ctaText: 'ORDER NOW',
+    ctaLink: '/products?category=b1000000-0000-0000-0000-000000000004',
+    priceText: 'From ₹260',
+  },
+  {
+    id: 'pootharekulu-slide',
+    title: 'Atreyapuram Bellam Pootharekulu',
+    subtitle: 'Wafer-thin rice paper wraps stuffed with hand-crushed dry fruits & organic jaggery.',
+    tag: 'Authentic Andhra',
+    videoUrl: `${SUPABASE_BASE_URL}/storage/v1/object/public/sweet-videos/pootharekulu-video.mp4`,
+    posterUrl: '/sweets/bellam-pootharekulu.jpg',
+    ctaText: 'ORDER NOW',
+    ctaLink: '/products?category=b1000000-0000-0000-0000-000000000007',
+    priceText: 'From ₹320',
+  },
+  {
+    id: 'assorted-slide',
+    title: 'Assorted Royal Sweets Box',
+    subtitle: 'A grand celebration hamper curated with Mysore Pak, Kaju Barfi, and Kaja varieties.',
+    tag: 'Grand Gifting',
+    videoUrl: `${SUPABASE_BASE_URL}/storage/v1/object/public/sweet-videos/assorted-sweets.mp4`,
+    posterUrl: '/sweets/mysore-pak.jpg',
+    ctaText: 'ORDER NOW',
+    ctaLink: '/products',
+    priceText: 'From ₹499',
+  },
+  {
+    id: 'packing-slide',
+    title: 'Artisanal Fresh Packing',
+    subtitle: 'Vacuum-sealed freshness boxes prepared every morning and shipped nationwide.',
+    tag: 'Freshness Guaranteed',
+    videoUrl: `${SUPABASE_BASE_URL}/storage/v1/object/public/sweet-videos/sweets-packing.mp4`,
+    posterUrl: '/sweets/special-andhra-ribbon-murukku.jpg',
+    ctaText: 'ORDER NOW',
+    ctaLink: '/products',
+    priceText: 'Express Delivery',
+  },
+];
+
+export interface TemptationVideoCard {
+  id: string;
+  name: string;
+  category: string;
+  tasteNote: string;
+  videoUrl: string;
+  posterUrl: string;
+  price: number;
+  slug: string;
+  productId?: string;
+}
+
+export const DEFAULT_TEMPTATION_VIDEOS: TemptationVideoCard[] = [
+  {
+    id: 'tempt-kaja',
+    name: 'Kakinada Gottam Kaja',
+    category: 'Kaja Specials',
+    tasteNote: 'Crisp exterior with hot juicy syrup heart',
+    videoUrl: `${SUPABASE_BASE_URL}/storage/v1/object/public/sweet-videos/kaja-video.mp4`,
+    posterUrl: '/sweets/kakinada-gottam-kaja.jpg',
+    price: 240,
+    slug: 'kakinada-gottam-kaja',
+  },
+  {
+    id: 'tempt-laddu',
+    name: 'Special Motichoor Laddu',
+    category: 'Laddu Varieties',
+    tasteNote: 'Slow-cooked in pure cow ghee with saffron',
+    videoUrl: `${SUPABASE_BASE_URL}/storage/v1/object/public/sweet-videos/laddu-video.mp4`,
+    posterUrl: '/sweets/mothi-laddu.jpg',
+    price: 260,
+    slug: 'mothi-laddu',
+  },
+  {
+    id: 'tempt-pootharekulu',
+    name: 'Dry Fruit Bellam Pootharekulu',
+    category: 'Pootharekulu',
+    tasteNote: 'Delicate edible rice film & roasted dry fruits',
+    videoUrl: `${SUPABASE_BASE_URL}/storage/v1/object/public/sweet-videos/pootharekulu-video.mp4`,
+    posterUrl: '/sweets/dry-fruit-bellam-pootharekulu.jpg',
+    price: 360,
+    slug: 'dry-fruit-bellam-pootharekulu',
+  },
+  {
+    id: 'tempt-assorted',
+    name: 'Royal Mysore Pak & Kalakand',
+    category: 'Milk & Ghee Sweets',
+    tasteNote: 'Rich melt-in-mouth fudge made with pure cream',
+    videoUrl: `${SUPABASE_BASE_URL}/storage/v1/object/public/sweet-videos/assorted-sweets.mp4`,
+    posterUrl: '/sweets/mysore-pak.jpg',
+    price: 280,
+    slug: 'mysore-pak',
+  },
+];
 
 /**
  * Fetch dynamic site configuration from Supabase site_settings table
@@ -310,3 +438,59 @@ export async function uploadProductSweetImage(
     };
   }
 }
+
+/**
+ * Upload sweet video file to Supabase Storage (sweet-videos or hero-videos bucket)
+ */
+export async function uploadSweetVideoFile(
+  file: File,
+  filename: string,
+  bucket: string = SWEET_VIDEOS_STORAGE_BUCKET
+): Promise<UploadImageResult> {
+  try {
+    const allowedTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
+    if (!allowedTypes.includes(file.type.toLowerCase()) && !file.name.endsWith('.mp4') && !file.name.endsWith('.webm')) {
+      return {
+        success: false,
+        error: `Invalid video format (${file.type}). Please provide an MP4 or WebM video file.`,
+      };
+    }
+
+    const MAX_VIDEO_SIZE = 100 * 1024 * 1024;
+    if (file.size > MAX_VIDEO_SIZE) {
+      return {
+        success: false,
+        error: `Video is too large (${(file.size / (1024 * 1024)).toFixed(2)}MB). Max allowed size is 100MB.`,
+      };
+    }
+
+    const cleanFilename = filename.toLowerCase().endsWith('.mp4') ? filename : `${filename}.mp4`;
+    const { error: uploadError } = await supabase.storage
+      .from(bucket)
+      .upload(cleanFilename, file, {
+        cacheControl: '3600',
+        upsert: true,
+        contentType: 'video/mp4',
+      });
+
+    if (uploadError) {
+      return { success: false, error: uploadError.message };
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(cleanFilename);
+
+    return {
+      success: true,
+      publicUrl: publicUrlData.publicUrl,
+      storagePath: cleanFilename,
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      error: err.message || 'Failed to upload sweet video.',
+    };
+  }
+}
+
