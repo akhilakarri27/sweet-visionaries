@@ -75,7 +75,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
   return (
     <>
       {/* Top Heritage Notice Bar */}
-      <div className="bg-brand-maroon text-[#FFFDF9] py-1.5 px-4 text-xs font-medium text-center flex items-center justify-center gap-2 tracking-wide">
+      <div className="bg-brand-primary text-white py-1.5 px-4 text-xs font-medium text-center flex items-center justify-center gap-2 tracking-wide">
         <Sparkles className="w-3.5 h-3.5 text-brand-gold-light animate-pulse" />
         <span>Authentic Andhra Sweets & Legendary Kakinada Gottam Kaja • Free Express Delivery on orders over ₹799!</span>
         <Sparkles className="w-3.5 h-3.5 text-brand-gold-light animate-pulse hidden sm:inline" />
@@ -87,8 +87,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
           isScrolled
             ? 'glass-panel shadow-soft py-3'
             : location.pathname === '/'
-              ? 'bg-stone-950/80 backdrop-blur-md border-b border-brand-gold/30 text-[#FFFDF9] py-3.5'
-              : 'bg-[#FFFDF9]/95 backdrop-blur-md border-b border-brand-border py-4'
+              ? 'bg-stone-950/85 backdrop-blur-md border-b border-brand-gold/30 text-white py-3.5'
+              : 'bg-white/95 backdrop-blur-md border-b border-brand-border py-4'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -96,12 +96,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
             
             {/* Brand Logo */}
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-brand-maroon to-brand-maroon-dark flex items-center justify-center shadow-gold border-2 border-brand-gold-light transition-transform duration-300 group-hover:scale-105">
-                <span className="text-brand-gold-light font-serif font-bold text-xl tracking-wider">K</span>
+              <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-brand-primary to-brand-primary-hover flex items-center justify-center shadow-primary border-2 border-brand-gold-light transition-transform duration-300 group-hover:scale-105">
+                <span className="text-white font-serif font-bold text-xl tracking-wider">K</span>
               </div>
               <div className="flex flex-col">
                 <span className={`font-serif font-black text-2xl tracking-tight leading-none ${
-                  !isScrolled && location.pathname === '/' ? 'text-[#FFFDF9]' : 'text-brand-maroon'
+                  !isScrolled && location.pathname === '/' ? 'text-white' : 'text-brand-primary'
                 }`}>
                   KOTAIAH<span className="text-brand-gold"> SWEETS</span>
                 </span>
@@ -119,16 +119,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
             }`}>
               <Link
                 to="/"
-                className={`transition-colors hover:text-brand-gold ${
-                  location.pathname === '/' ? 'text-brand-gold font-bold' : ''
+                className={`transition-colors hover:text-brand-primary ${
+                  location.pathname === '/' ? 'text-brand-primary font-bold' : ''
                 }`}
               >
                 Home
               </Link>
               <Link
                 to="/products"
-                className={`transition-colors hover:text-brand-gold ${
-                  location.pathname === '/products' ? 'text-brand-gold font-semibold' : ''
+                className={`transition-colors hover:text-brand-primary ${
+                  location.pathname === '/products' ? 'text-brand-primary font-semibold' : ''
                 }`}
               >
                 All Sweets
@@ -138,16 +138,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
               <div className="relative group py-2">
                 <Link
                   to="/products"
-                  className="flex items-center gap-1 transition-colors hover:text-brand-gold"
+                  className="flex items-center gap-1 transition-colors hover:text-brand-primary"
                 >
                   Categories <ChevronDown className="w-3.5 h-3.5 opacity-60 group-hover:rotate-180 transition-transform" />
                 </Link>
-                <div className="absolute top-full left-0 hidden group-hover:block w-56 bg-[#FFFDF9] rounded-xl shadow-card border border-brand-border p-2 z-50 animate-in fade-in duration-200 text-brand-charcoal">
+                <div className="absolute top-full left-0 hidden group-hover:block w-56 bg-white rounded-xl shadow-card border border-brand-border p-2 z-50 animate-in fade-in duration-200 text-brand-charcoal">
                   {categories.map((cat) => (
                     <Link
                       key={cat.id}
                       to={`/products?category=${cat.id}`}
-                      className="block px-3 py-2 text-xs font-medium text-brand-charcoal hover:bg-brand-cream hover:text-brand-gold rounded-lg transition-colors"
+                      className="block px-3 py-2 text-xs font-medium text-brand-charcoal hover:bg-brand-light-orange hover:text-brand-primary rounded-lg transition-colors"
                     >
                       {cat.name}
                     </Link>
@@ -157,18 +157,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
 
               <Link
                 to="/offers"
-                className="transition-colors hover:text-brand-gold font-semibold flex items-center gap-1 text-amber-500"
+                className="transition-colors hover:text-brand-primary font-semibold flex items-center gap-1 text-brand-primary"
               >
-                <span className="w-2 h-2 rounded-full bg-brand-gold animate-ping inline-block" />
+                <span className="w-2 h-2 rounded-full bg-brand-primary animate-ping inline-block" />
                 Offers
               </Link>
-              <Link to="/about" className="transition-colors hover:text-brand-gold">
+              <Link to="/about" className="transition-colors hover:text-brand-primary">
                 Heritage
               </Link>
-              <Link to="/reviews" className="transition-colors hover:text-brand-gold">
+              <Link to="/reviews" className="transition-colors hover:text-brand-primary">
                 Reviews
               </Link>
-              <Link to="/contact" className="transition-colors hover:text-brand-gold">
+              <Link to="/contact" className="transition-colors hover:text-brand-primary">
                 Contact
               </Link>
             </nav>
@@ -182,8 +182,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
                 placeholder="Search Gottam Kaja, Mysore Pak..."
                 className={`w-full text-xs pl-9 pr-4 py-2 rounded-full border transition-all ${
                   !isScrolled && location.pathname === '/'
-                    ? 'bg-stone-900/90 text-white placeholder:text-stone-400 border-stone-700 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold'
-                    : 'bg-brand-surface text-brand-charcoal border-brand-border focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold'
+                    ? 'bg-stone-900/90 text-white placeholder:text-stone-400 border-stone-700 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary'
+                    : 'bg-brand-light-orange text-brand-charcoal border-brand-border focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary'
                 }`}
               />
               <Search className={`w-4 h-4 absolute left-3 top-2.5 pointer-events-none ${
@@ -197,7 +197,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
               {onOpenChatbot && (
                 <button
                   onClick={onOpenChatbot}
-                  className="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-brand-maroon to-brand-maroon-dark text-brand-gold-light px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-soft hover:shadow-gold transition-all border border-brand-gold/40 hover:scale-105"
+                  className="hidden sm:flex items-center gap-1.5 bg-brand-primary hover:bg-brand-primary-hover text-white px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-primary transition-all border border-brand-gold/40 hover:scale-105"
                   title="Open AI Shopping Assistant"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-brand-gold-light" />
@@ -208,14 +208,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
               {/* Wishlist Link */}
               <Link
                 to="/account?tab=wishlist"
-                className={`relative p-2 hover:text-brand-gold transition-colors ${
+                className={`relative p-2 hover:text-brand-primary transition-colors ${
                   !isScrolled && location.pathname === '/' ? 'text-stone-200' : 'text-brand-charcoal'
                 }`}
                 title="Wishlist"
               >
                 <Heart className="w-5 h-5" />
                 {wishlistIds.length > 0 && (
-                  <span className="absolute top-1 right-1 bg-brand-maroon text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  <span className="absolute top-1 right-1 bg-brand-primary text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                     {wishlistIds.length}
                   </span>
                 )}
@@ -224,14 +224,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
               {/* Cart Link */}
               <Link
                 to="/cart"
-                className={`relative p-2 hover:text-brand-gold transition-colors ${
+                className={`relative p-2 hover:text-brand-primary transition-colors ${
                   !isScrolled && location.pathname === '/' ? 'text-stone-200' : 'text-brand-charcoal'
                 }`}
                 title="Shopping Cart"
               >
                 <ShoppingBag className="w-5 h-5" />
                 {totalItemsCount > 0 && (
-                  <span className="absolute top-1 right-1 bg-brand-gold text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center animate-bounce">
+                  <span className="absolute top-1 right-1 bg-brand-primary text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center animate-bounce shadow-xs">
                     {totalItemsCount}
                   </span>
                 )}
@@ -243,21 +243,21 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
                   <div className="relative">
                     <button
                       onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                      className="flex items-center gap-1 p-1.5 rounded-full border border-brand-border hover:border-brand-gold transition-all bg-brand-surface"
+                      className="flex items-center gap-1 p-1.5 rounded-full border border-brand-border hover:border-brand-primary transition-all bg-brand-light-orange"
                     >
-                      <div className="w-7 h-7 rounded-full bg-brand-maroon text-brand-gold-light flex items-center justify-center text-xs font-bold font-serif">
+                      <div className="w-7 h-7 rounded-full bg-brand-primary text-white flex items-center justify-center text-xs font-bold font-serif shadow-xs">
                         {profile?.full_name?.charAt(0) || user.email?.charAt(0).toUpperCase() || 'U'}
                       </div>
                     </button>
 
                     {userDropdownOpen && (
-                      <div className="absolute right-0 mt-2 w-56 bg-[#FFFDF9] rounded-xl shadow-card border border-brand-border p-2 z-50 animate-in fade-in duration-150 text-brand-charcoal">
+                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-card border border-brand-border p-2 z-50 animate-in fade-in duration-150 text-brand-charcoal">
                         <div className="px-3 py-2 border-b border-brand-border/60">
                           <p className="text-xs font-semibold text-brand-charcoal truncate">
                             {profile?.full_name || 'Valued Customer'}
                           </p>
                           <p className="text-[10px] text-brand-muted truncate">{user.email}</p>
-                          <span className="inline-block mt-1 px-2 py-0.5 bg-brand-cream text-brand-maroon text-[9px] font-bold uppercase rounded">
+                          <span className="inline-block mt-1 px-2 py-0.5 bg-brand-light-orange text-brand-primary text-[9px] font-bold uppercase rounded">
                             {role}
                           </span>
                         </div>
@@ -266,9 +266,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
                           <Link
                             to="/account"
                             onClick={() => setUserDropdownOpen(false)}
-                            className="flex items-center gap-2 px-3 py-2 text-xs text-brand-charcoal hover:bg-brand-cream rounded-lg transition-colors"
+                            className="flex items-center gap-2 px-3 py-2 text-xs text-brand-charcoal hover:bg-brand-light-orange hover:text-brand-primary rounded-lg transition-colors"
                           >
-                            <User className="w-3.5 h-3.5 text-brand-gold" />
+                            <User className="w-3.5 h-3.5 text-brand-primary" />
                             My Account & Orders
                           </Link>
 
@@ -276,9 +276,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
                             <Link
                               to="/owner"
                               onClick={() => setUserDropdownOpen(false)}
-                              className="flex items-center gap-2 px-3 py-2 text-xs text-brand-maroon font-semibold hover:bg-brand-cream rounded-lg transition-colors"
+                              className="flex items-center gap-2 px-3 py-2 text-xs text-brand-primary font-semibold hover:bg-brand-light-orange rounded-lg transition-colors"
                             >
-                              <Store className="w-3.5 h-3.5 text-brand-maroon" />
+                              <Store className="w-3.5 h-3.5 text-brand-primary" />
                               Shop Owner Portal
                             </Link>
                           )}
@@ -287,7 +287,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
                             <Link
                               to="/admin"
                               onClick={() => setUserDropdownOpen(false)}
-                              className="flex items-center gap-2 px-3 py-2 text-xs text-brand-gold-dark font-semibold hover:bg-brand-cream rounded-lg transition-colors"
+                              className="flex items-center gap-2 px-3 py-2 text-xs text-brand-gold-dark font-semibold hover:bg-brand-light-orange rounded-lg transition-colors"
                             >
                               <ShieldCheck className="w-3.5 h-3.5 text-brand-gold" />
                               Super Admin Console
@@ -310,8 +310,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
                     to="/login"
                     className={`flex items-center gap-1.5 border px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
                       !isScrolled && location.pathname === '/'
-                        ? 'bg-brand-gold text-stone-950 border-brand-gold hover:bg-brand-gold-light font-bold'
-                        : 'bg-brand-cream border-brand-border text-brand-maroon hover:bg-brand-gold hover:text-white hover:border-brand-gold'
+                        ? 'bg-brand-primary text-white border-brand-primary hover:bg-brand-primary-hover font-bold shadow-primary'
+                        : 'bg-brand-primary text-white border-brand-primary hover:bg-brand-primary-hover shadow-xs'
                     }`}
                   >
                     <User className="w-3.5 h-3.5" />
@@ -323,7 +323,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenChatbot }) => {
               {/* Mobile Menu Toggle Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`lg:hidden p-2 hover:text-brand-gold ${
+                className={`lg:hidden p-2 hover:text-brand-primary ${
                   !isScrolled && location.pathname === '/' ? 'text-stone-200' : 'text-brand-charcoal'
                 }`}
               >

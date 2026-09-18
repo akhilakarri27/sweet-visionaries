@@ -61,11 +61,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onToast }) =>
   };
 
   return (
-    <div className="group bg-[#FFFDF9] rounded-2xl border border-brand-border/90 p-4 shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 relative">
+    <div className="group bg-white rounded-2xl border border-brand-border/90 p-4 shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 relative">
       
       <div>
         {/* Image Container with Badges */}
-        <div className="relative w-full h-52 rounded-xl overflow-hidden bg-brand-surface mb-3">
+        <div className="relative w-full h-52 rounded-xl overflow-hidden bg-brand-light-orange mb-3">
           <Link to={`/products/${product.id}`}>
             <img
               src={primaryImage}
@@ -81,7 +81,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onToast }) =>
           {/* Badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
             {product.is_featured && (
-              <span className="bg-brand-maroon text-brand-gold-light text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full shadow-sm tracking-wider">
+              <span className="bg-brand-primary text-white text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full shadow-sm tracking-wider">
                 Festive Best Seller
               </span>
             )}
@@ -113,27 +113,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onToast }) =>
 
         {/* Category & Rating Row */}
         <div className="flex items-center justify-between gap-2 text-xs mb-1.5">
-          <span className="text-brand-gold font-semibold uppercase tracking-wider text-[11px] truncate">
+          <span className="text-brand-gold font-semibold uppercase tracking-wider text-[11px] truncate font-serif">
             {product.categories?.name || 'Traditional Delicacy'}
           </span>
-          <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">
-            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            <span className="font-bold text-amber-900 text-xs">
+          <div className="flex items-center gap-1 bg-brand-light-orange px-2 py-0.5 rounded-md border border-brand-border">
+            <Star className="w-3.5 h-3.5 text-brand-gold fill-brand-gold" />
+            <span className="font-bold text-brand-charcoal text-xs">
               {Number(product.rating || 5.0).toFixed(1)}
             </span>
-            <span className="text-[10px] text-stone-500">({product.review_count || 0})</span>
+            <span className="text-[10px] text-brand-muted">({product.review_count || 0})</span>
           </div>
         </div>
 
         {/* Product Title */}
-        <Link to={`/products/${product.id}`} className="block group-hover:text-brand-gold transition-colors">
+        <Link to={`/products/${product.id}`} className="block group-hover:text-brand-primary transition-colors">
           <h3 className="font-serif font-bold text-base text-brand-charcoal leading-snug line-clamp-1">
             {product.name}
           </h3>
         </Link>
 
         {/* Short Description */}
-        <p className="text-xs text-stone-600 mt-1 line-clamp-2 leading-relaxed font-sans">
+        <p className="text-xs text-brand-muted mt-1 line-clamp-2 leading-relaxed font-sans">
           {product.description}
         </p>
 
@@ -146,8 +146,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onToast }) =>
               onClick={() => setSelectedWeight(w)}
               className={`text-[11px] font-semibold px-2 py-1 rounded-md border transition-all ${
                 selectedWeight === w
-                  ? 'bg-brand-maroon text-brand-gold-light border-brand-maroon shadow-xs'
-                  : 'bg-brand-surface text-stone-600 border-brand-border hover:border-brand-gold'
+                  ? 'bg-brand-primary text-white border-brand-primary shadow-xs'
+                  : 'bg-brand-light-orange text-brand-muted border-brand-border hover:border-brand-primary hover:text-brand-primary'
               }`}
             >
               {w}
@@ -160,12 +160,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onToast }) =>
       <div className="mt-4 pt-3 border-t border-brand-border/60">
         <div className="flex items-baseline justify-between mb-3">
           <div>
-            <span className="text-xs text-stone-500 mr-1">Price:</span>
-            <span className="font-serif font-black text-lg text-brand-maroon">
+            <span className="text-xs text-brand-muted mr-1">Price:</span>
+            <span className="font-serif font-black text-lg text-brand-primary">
               ₹{currentPrice}
             </span>
           </div>
-          <span className="text-[11px] text-stone-500">for {selectedWeight}</span>
+          <span className="text-[11px] text-brand-muted">for {selectedWeight}</span>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
@@ -174,8 +174,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onToast }) =>
             disabled={!product.is_available || product.stock === 0}
             className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold transition-all ${
               isAdded
-                ? 'bg-emerald-600 text-white'
-                : 'bg-brand-cream border border-brand-gold/60 text-brand-maroon hover:bg-brand-gold hover:text-white hover:border-brand-gold'
+                ? 'bg-[#2E8B57] text-white'
+                : 'bg-brand-light-orange border border-brand-primary/40 text-brand-primary hover:bg-brand-primary hover:text-white'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {isAdded ? (
@@ -194,7 +194,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onToast }) =>
           <button
             onClick={handleBuyNow}
             disabled={!product.is_available || product.stock === 0}
-            className="flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-brand-maroon to-brand-maroon-dark text-brand-gold-light hover:shadow-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02]"
+            className="flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl text-xs font-bold bg-brand-primary hover:bg-brand-primary-hover text-white shadow-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02]"
           >
             <span>Buy Now</span>
             <ArrowRight className="w-3.5 h-3.5" />

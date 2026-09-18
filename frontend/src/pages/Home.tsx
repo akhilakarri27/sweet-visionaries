@@ -253,7 +253,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
   };
 
   return (
-    <div className="bg-heritage-ivory min-h-screen space-y-16 sm:space-y-24 pb-16">
+    <div className="bg-heritage-ivory min-h-screen space-y-16 sm:space-y-24 pb-16 text-brand-charcoal">
       
       {/* 1. HERO VIDEO SECTION */}
       <section className="relative w-full min-h-[85vh] lg:min-h-[92vh] flex items-center justify-center overflow-hidden bg-stone-950 border-b border-brand-gold/30">
@@ -285,21 +285,21 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
         {/* Subtle Warm Overlay for readability without dimming the sweets */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/60 pointer-events-none" />
 
-        {/* Soft Bottom Gradient Fade connecting Hero into warm ivory background */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-28 bg-gradient-to-t from-[#FAF6EE] to-transparent pointer-events-none z-10" />
+        {/* Soft Bottom Gradient Fade connecting Hero into page background (#FFF9F5) */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-28 bg-gradient-to-t from-[#FFF9F5] to-transparent pointer-events-none z-10" />
 
         {/* Hero Content Area */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center space-y-7">
           
           {/* Heritage Pill Badge */}
-          <div className="inline-flex items-center gap-2 bg-brand-maroon/90 border border-brand-gold/60 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-brand-gold-light shadow-gold">
-            <Sparkles className="w-4 h-4 text-brand-gold animate-spin-slow" />
+          <div className="inline-flex items-center gap-2 bg-brand-primary border border-brand-gold/60 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-white shadow-primary">
+            <Sparkles className="w-4 h-4 text-brand-gold-light animate-spin-slow" />
             <span>Master Artisans of Authentic Andhra Sweets • Since 1900</span>
           </div>
 
           {/* Headline and Tagline */}
           <div className="space-y-3">
-            <h1 className="font-serif font-black text-4xl sm:text-6xl lg:text-7xl text-[#FFFDF9] tracking-tight leading-[1.1] drop-shadow-lg">
+            <h1 className="font-serif font-black text-4xl sm:text-6xl lg:text-7xl text-[#FFFFFF] tracking-tight leading-[1.1] drop-shadow-lg">
               {heroHeading}
             </h1>
             <p className="font-serif italic text-lg sm:text-2xl lg:text-3xl text-brand-gold-light drop-shadow font-medium">
@@ -316,7 +316,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
           <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
             <a
               href="#menu"
-              className="flex items-center gap-2 bg-gradient-to-r from-brand-gold to-amber-500 hover:from-amber-500 hover:to-brand-gold text-stone-950 px-8 py-4 rounded-full font-black text-sm tracking-wide shadow-gold hover:scale-105 hover:shadow-float transition-all cursor-pointer"
+              className="flex items-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white px-8 py-4 rounded-full font-black text-sm tracking-wide shadow-primary hover:scale-105 transition-all cursor-pointer"
             >
               <span>{heroCtaText}</span>
               <ArrowRight className="w-4 h-4" />
@@ -324,7 +324,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
 
             <Link
               to="/products"
-              className="flex items-center gap-2 bg-brand-maroon/90 hover:bg-brand-maroon text-[#FFFDF9] border border-brand-gold/60 px-8 py-4 rounded-full font-bold text-sm shadow-soft hover:scale-105 transition-all backdrop-blur-md"
+              className="flex items-center gap-2 bg-[#241B18]/90 hover:bg-[#241B18] text-[#FFFFFF] border border-brand-gold/60 px-8 py-4 rounded-full font-bold text-sm shadow-soft hover:scale-105 transition-all backdrop-blur-md"
             >
               <ShoppingBag className="w-4 h-4 text-brand-gold-light" />
               <span>Order Now</span>
@@ -375,14 +375,14 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
             <h2 className="font-serif font-black text-3xl sm:text-4xl text-brand-charcoal">
               Featured Signature Sweets
             </h2>
-            <p className="text-xs sm:text-sm text-stone-600 font-sans">
+            <p className="text-xs sm:text-sm text-brand-muted font-sans">
               Handpicked customer favourites crafted fresh with pure country cow ghee and generational recipes.
             </p>
           </div>
 
           <Link
             to="/products"
-            className="flex items-center gap-1.5 text-xs font-bold text-brand-maroon hover:text-brand-gold transition-colors bg-brand-surface px-4 py-2 rounded-full border border-brand-border"
+            className="flex items-center gap-1.5 text-xs font-bold text-brand-primary hover:text-brand-primary-hover transition-colors bg-brand-light-orange px-4 py-2 rounded-full border border-brand-border"
           >
             <span>View All ({allProducts.length}) Sweets</span>
             <ChevronRight className="w-4 h-4" />
@@ -396,16 +396,16 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
             return (
               <div
                 key={product.id}
-                className="group bg-[#FFFDF9] rounded-2xl border border-brand-border/90 p-4 shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 relative"
+                className="group bg-white rounded-2xl border border-brand-border/90 p-4 shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 relative"
               >
                 <div>
                   {/* Badge */}
-                  <span className="absolute top-6 left-6 z-10 bg-brand-maroon text-brand-gold-light text-[9px] font-black uppercase px-2.5 py-1 rounded-full shadow-soft">
+                  <span className="absolute top-6 left-6 z-10 bg-brand-primary text-white text-[9px] font-black uppercase px-2.5 py-1 rounded-full shadow-soft">
                     ⭐ Featured
                   </span>
 
                   {/* Image Container */}
-                  <div className="relative w-full h-48 rounded-xl overflow-hidden bg-brand-surface mb-3">
+                  <div className="relative w-full h-48 rounded-xl overflow-hidden bg-brand-light-orange mb-3">
                     <img
                       src={primaryImg}
                       alt={product.name}
@@ -457,7 +457,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                       {product.categories?.name || 'Traditional Delicacy'}
                     </span>
                     <div className="flex items-center gap-0.5 text-amber-600 text-xs font-bold">
-                      <Star className="w-3 h-3 fill-current" />
+                      <Star className="w-3 h-3 fill-current text-brand-gold" />
                       <span>{Number(product.rating || 5.0).toFixed(1)}</span>
                     </div>
                   </div>
@@ -469,12 +469,12 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                       setModalWeight(product.weight || '500g');
                       setModalQuantity(1);
                     }}
-                    className="font-serif font-bold text-sm text-brand-charcoal line-clamp-1 hover:text-brand-gold cursor-pointer"
+                    className="font-serif font-bold text-sm text-brand-charcoal line-clamp-1 hover:text-brand-primary cursor-pointer"
                   >
                     {product.name}
                   </h3>
 
-                  <p className="text-[11px] text-stone-500 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-[11px] text-brand-muted mt-1 line-clamp-2 leading-relaxed">
                     {product.description}
                   </p>
                 </div>
@@ -482,8 +482,8 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                 {/* Price & Action */}
                 <div className="mt-4 pt-3 border-t border-brand-border/60 flex items-center justify-between">
                   <div>
-                    <span className="text-xs text-stone-500 mr-1">Price:</span>
-                    <span className="font-serif font-black text-base text-brand-maroon">
+                    <span className="text-xs text-brand-muted mr-1">Price:</span>
+                    <span className="font-serif font-black text-base text-brand-primary">
                       ₹{product.price}
                     </span>
                     <span className="text-[10px] text-stone-400 block">for {product.weight || '500g'}</span>
@@ -495,7 +495,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                       setModalWeight(product.weight || '500g');
                       setModalQuantity(1);
                     }}
-                    className="flex items-center gap-1 bg-brand-maroon text-brand-gold-light text-xs font-bold px-3 py-2 rounded-xl hover:bg-brand-gold hover:text-white transition-colors"
+                    className="flex items-center gap-1 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold px-3 py-2 rounded-xl transition-colors shadow-xs"
                   >
                     <span>View & Order</span>
                     <ArrowRight className="w-3 h-3" />
@@ -513,7 +513,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
       </div>
 
       {/* 3. CATEGORIES SECTION */}
-      <section id="categories" className="bg-heritage-mandala py-16 border-y border-brand-gold/25 relative overflow-hidden">
+      <section id="categories" className="bg-heritage-mandala py-16 border-y border-brand-border/80 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="text-center max-w-2xl mx-auto space-y-2">
             <span className="text-xs font-bold text-brand-gold uppercase tracking-wider font-serif">
@@ -522,7 +522,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
             <h2 className="font-serif font-black text-3xl sm:text-4xl text-brand-charcoal">
               Explore By Sweet Categories
             </h2>
-            <p className="text-xs sm:text-sm text-stone-600 font-sans">
+            <p className="text-xs sm:text-sm text-brand-muted font-sans">
               Discover authentic Andhra culinary delicacies prepared with time-honored traditional protocols.
             </p>
           </div>
@@ -561,9 +561,9 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                 <Link
                   key={cat.slug}
                   to={categoryLink}
-                  className="group bg-[#FFFDF9] rounded-2xl border border-brand-border/80 overflow-hidden shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 text-center"
+                  className="group bg-white rounded-2xl border border-brand-border/80 overflow-hidden shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 text-center"
                 >
-                  <div className="relative w-full h-36 overflow-hidden bg-brand-surface">
+                  <div className="relative w-full h-36 overflow-hidden bg-brand-light-orange">
                     <img
                       src={repImageUrl}
                       alt={cat.name}
@@ -578,18 +578,18 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
 
                   <div className="p-4 space-y-1.5 flex flex-col justify-between flex-1">
                     <div>
-                      <h3 className="font-serif font-bold text-sm text-brand-charcoal group-hover:text-brand-gold transition-colors line-clamp-1">
+                      <h3 className="font-serif font-bold text-sm text-brand-charcoal group-hover:text-brand-primary transition-colors line-clamp-1">
                         {cat.name}
                       </h3>
-                      <p className="text-[11px] text-stone-500 line-clamp-2 leading-relaxed mt-1">
+                      <p className="text-[11px] text-brand-muted line-clamp-2 leading-relaxed mt-1">
                         {cat.description}
                       </p>
                     </div>
                     <div className="pt-2 flex items-center justify-between border-t border-brand-border/50 mt-2">
-                      <span className="inline-block text-[10px] font-bold text-brand-maroon bg-brand-cream px-2.5 py-0.5 rounded-full">
+                      <span className="inline-block text-[10px] font-bold text-brand-primary bg-brand-light-orange px-2.5 py-0.5 rounded-full">
                         {countText}
                       </span>
-                      <span className="text-[11px] font-bold text-brand-gold group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
+                      <span className="text-[11px] font-bold text-brand-primary group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
                         <span>Browse</span>
                         <ArrowRight className="w-3 h-3" />
                       </span>
@@ -610,14 +610,14 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
       {/* 4. POPULAR & BESTSELLER PRODUCTS (FULL CATALOGUE WITH TABS) */}
       <section id="menu" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center max-w-3xl mx-auto space-y-2">
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-gold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-gold uppercase tracking-wider font-serif">
             <Flame className="w-4 h-4 fill-brand-gold text-brand-gold" />
             <span>Complete Traditional Sweets Menu</span>
           </div>
           <h2 className="font-serif font-black text-3xl sm:text-4xl text-brand-charcoal">
             Popular & Bestseller Sweets
           </h2>
-          <p className="text-xs sm:text-sm text-stone-600 font-sans">
+          <p className="text-xs sm:text-sm text-brand-muted font-sans">
             Choose your favorites below. Click on any item for full ingredients, taste profile, weight options, and instant order.
           </p>
         </div>
@@ -638,8 +638,8 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
               onClick={() => setSelectedCategoryTab(tab.key)}
               className={`px-4 py-2 rounded-full text-xs font-bold transition-all border ${
                 selectedCategoryTab === tab.key
-                  ? 'bg-brand-maroon text-brand-gold-light border-brand-maroon shadow-soft scale-105'
-                  : 'bg-[#FFFDF9] text-stone-700 border-brand-border hover:border-brand-gold hover:bg-brand-surface'
+                  ? 'bg-brand-primary text-white border-brand-primary shadow-xs scale-105'
+                  : 'bg-white text-brand-muted border-brand-border hover:border-brand-primary hover:text-brand-primary'
               }`}
             >
               {tab.label}
@@ -655,11 +655,11 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
             return (
               <div
                 key={product.id}
-                className="group bg-[#FFFDF9] rounded-2xl border border-brand-border/90 p-4 shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 relative"
+                className="group bg-white rounded-2xl border border-brand-border/90 p-4 shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 relative"
               >
                 <div>
                   {/* Image */}
-                  <div className="relative w-full h-48 rounded-xl overflow-hidden bg-brand-surface mb-3">
+                  <div className="relative w-full h-48 rounded-xl overflow-hidden bg-brand-light-orange mb-3">
                     <img
                       src={primaryImg}
                       alt={product.name}
@@ -711,7 +711,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                       {product.categories?.name || 'Traditional Delicacy'}
                     </span>
                     <div className="flex items-center gap-0.5 text-amber-600 text-xs font-bold">
-                      <Star className="w-3 h-3 fill-current" />
+                      <Star className="w-3 h-3 fill-current text-brand-gold" />
                       <span>{Number(product.rating || 5.0).toFixed(1)}</span>
                     </div>
                   </div>
@@ -723,12 +723,12 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                       setModalWeight(product.weight || '500g');
                       setModalQuantity(1);
                     }}
-                    className="font-serif font-bold text-sm text-brand-charcoal line-clamp-1 hover:text-brand-gold cursor-pointer"
+                    className="font-serif font-bold text-sm text-brand-charcoal line-clamp-1 hover:text-brand-primary cursor-pointer"
                   >
                     {product.name}
                   </h3>
 
-                  <p className="text-[11px] text-stone-500 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-[11px] text-brand-muted mt-1 line-clamp-2 leading-relaxed">
                     {product.description}
                   </p>
                 </div>
@@ -736,8 +736,8 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                 {/* Price & Action */}
                 <div className="mt-4 pt-3 border-t border-brand-border/60 flex items-center justify-between">
                   <div>
-                    <span className="text-xs text-stone-500 mr-1">Price:</span>
-                    <span className="font-serif font-black text-base text-brand-maroon">
+                    <span className="text-xs text-brand-muted mr-1">Price:</span>
+                    <span className="font-serif font-black text-base text-brand-primary">
                       ₹{product.price}
                     </span>
                     <span className="text-[10px] text-stone-400 block">for {product.weight || '500g'}</span>
@@ -749,7 +749,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                       setModalWeight(product.weight || '500g');
                       setModalQuantity(1);
                     }}
-                    className="flex items-center gap-1 bg-brand-maroon text-brand-gold-light text-xs font-bold px-3 py-2 rounded-xl hover:bg-brand-gold hover:text-white transition-colors"
+                    className="flex items-center gap-1 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold px-3 py-2 rounded-xl transition-colors shadow-xs"
                   >
                     <span>View & Order</span>
                     <ArrowRight className="w-3 h-3" />
@@ -768,7 +768,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
 
       {/* 5. ABOUT / BRAND HERITAGE SECTION */}
       <section id="about" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center bg-[#FFFDF9] bg-heritage-mandala rounded-3xl border border-brand-gold/30 p-6 sm:p-10 shadow-soft">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center bg-white bg-heritage-mandala rounded-3xl border border-brand-gold/40 p-6 sm:p-10 shadow-soft">
           
           <div className="lg:col-span-7 space-y-4">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-gold uppercase tracking-wider font-serif">
@@ -778,40 +778,40 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
             <h2 className="font-serif font-black text-3xl sm:text-4xl text-brand-charcoal leading-tight">
               About Kotaiah Sweets
             </h2>
-            <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-sans">
+            <p className="text-xs sm:text-sm text-brand-muted leading-relaxed font-sans">
               Founded in <strong>1900 in Kakinada, Andhra Pradesh</strong>, Kotaiah Sweets is the home of the world-famous <strong>Kakinada Gottam Kaja</strong>. For over a century, our master confectionery artisans have preserved the authentic taste, layered crunch, and warm cardamom syrup infusion that has delighted generations of sweet lovers across India.
             </p>
-            <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-sans">
+            <p className="text-xs sm:text-sm text-brand-muted leading-relaxed font-sans">
               Every preparation strictly uses 100% pure desi cow ghee, freshly ground spices, and traditional brass and copper vessels to achieve the genuine aroma and velvety richness celebrated in every festive moment.
             </p>
 
             <div className="grid grid-cols-3 gap-4 pt-4 border-t border-brand-border/60 text-center sm:text-left">
               <div>
-                <div className="font-serif font-black text-2xl text-brand-maroon">1900</div>
-                <div className="text-[11px] text-stone-500 font-medium">Established in Kakinada</div>
+                <div className="font-serif font-black text-2xl text-brand-primary">1900</div>
+                <div className="text-[11px] text-brand-muted font-medium">Established in Kakinada</div>
               </div>
               <div>
-                <div className="font-serif font-black text-2xl text-brand-maroon">100%</div>
-                <div className="text-[11px] text-stone-500 font-medium">Pure Desi Cow Ghee</div>
+                <div className="font-serif font-black text-2xl text-brand-primary">100%</div>
+                <div className="text-[11px] text-brand-muted font-medium">Pure Desi Cow Ghee</div>
               </div>
               <div>
-                <div className="font-serif font-black text-2xl text-brand-maroon">43+</div>
-                <div className="text-[11px] text-stone-500 font-medium">Traditional Sweets</div>
+                <div className="font-serif font-black text-2xl text-brand-primary">43+</div>
+                <div className="text-[11px] text-brand-muted font-medium">Traditional Sweets</div>
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-5 relative">
-            <div className="rounded-2xl overflow-hidden border-2 border-brand-gold/40 shadow-card bg-brand-surface">
+            <div className="rounded-2xl overflow-hidden border-2 border-brand-gold/40 shadow-card bg-brand-light-orange">
               <img
                 src="/sweets/kakinada-gottam-kaja.jpg"
                 alt="Traditional Kakinada Gottam Kaja"
                 className="w-full h-72 object-cover object-center"
               />
-              <div className="p-4 bg-brand-surface border-t border-brand-border">
+              <div className="p-4 bg-white border-t border-brand-border">
                 <span className="text-[10px] font-bold text-brand-gold-dark uppercase tracking-wider block">Signature Creation</span>
                 <h4 className="font-serif font-bold text-sm text-brand-charcoal">Original Kakinada Gottam Kaja</h4>
-                <p className="text-[11px] text-stone-500">Crispy exterior with luscious cardamom syrup center.</p>
+                <p className="text-[11px] text-brand-muted">Crispy exterior with luscious cardamom syrup center.</p>
               </div>
             </div>
           </div>
@@ -820,7 +820,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
       </section>
 
       {/* 6. WHY CHOOSE US */}
-      <section id="why-choose-us" className="bg-heritage-warm py-16 border-y border-brand-gold/25">
+      <section id="why-choose-us" className="bg-heritage-warm py-16 border-y border-brand-border/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
             <span className="text-xs font-bold text-brand-gold uppercase tracking-wider font-serif">
@@ -829,48 +829,48 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
             <h2 className="font-serif font-black text-3xl text-brand-charcoal">
               Why Choose Kotaiah Sweets
             </h2>
-            <p className="text-xs sm:text-sm text-stone-600 font-sans">
+            <p className="text-xs sm:text-sm text-brand-muted font-sans">
               Every batch is crafted following traditional confectionery protocols to preserve purity and genuine taste.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-[#FFFDF9] p-6 rounded-2xl border border-brand-border shadow-soft text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-100/70 border border-amber-300/60 text-brand-gold-dark flex items-center justify-center mx-auto shadow-xs">
+            <div className="bg-white p-6 rounded-2xl border border-brand-border shadow-soft text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-brand-light-orange border border-brand-primary/20 text-brand-primary flex items-center justify-center mx-auto shadow-xs">
                 <Flame className="w-6 h-6" />
               </div>
               <h3 className="font-serif font-bold text-sm text-brand-charcoal">100% Pure Desi Ghee</h3>
-              <p className="text-xs text-stone-600 leading-relaxed">
+              <p className="text-xs text-brand-muted leading-relaxed">
                 Prepared exclusively with pure country cow ghee for signature aroma and velvety richness.
               </p>
             </div>
 
-            <div className="bg-[#FFFDF9] p-6 rounded-2xl border border-brand-border shadow-soft text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-100/70 border border-amber-300/60 text-brand-gold-dark flex items-center justify-center mx-auto shadow-xs">
+            <div className="bg-white p-6 rounded-2xl border border-brand-border shadow-soft text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-brand-light-orange border border-brand-primary/20 text-brand-primary flex items-center justify-center mx-auto shadow-xs">
                 <Award className="w-6 h-6" />
               </div>
               <h3 className="font-serif font-bold text-sm text-brand-charcoal">Original 1900 Recipe</h3>
-              <p className="text-xs text-stone-600 leading-relaxed">
+              <p className="text-xs text-brand-muted leading-relaxed">
                 Generational confectionery mastery creating authentic Gottam Kaja and Nethi Kaja.
               </p>
             </div>
 
-            <div className="bg-[#FFFDF9] p-6 rounded-2xl border border-brand-border shadow-soft text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-100/70 border border-amber-300/60 text-brand-gold-dark flex items-center justify-center mx-auto shadow-xs">
+            <div className="bg-white p-6 rounded-2xl border border-brand-border shadow-soft text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-brand-light-orange border border-brand-primary/20 text-brand-primary flex items-center justify-center mx-auto shadow-xs">
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <h3 className="font-serif font-bold text-sm text-brand-charcoal">Vacuum-Sealed Packing</h3>
-              <p className="text-xs text-stone-600 leading-relaxed">
+              <p className="text-xs text-brand-muted leading-relaxed">
                 Food grade tamper-proof packing ensuring peak crispiness and freshness delivered to your doorstep.
               </p>
             </div>
 
-            <div className="bg-[#FFFDF9] p-6 rounded-2xl border border-brand-border shadow-soft text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-100/70 border border-amber-300/60 text-brand-gold-dark flex items-center justify-center mx-auto shadow-xs">
+            <div className="bg-white p-6 rounded-2xl border border-brand-border shadow-soft text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-brand-light-orange border border-brand-primary/20 text-brand-primary flex items-center justify-center mx-auto shadow-xs">
                 <Clock className="w-6 h-6" />
               </div>
               <h3 className="font-serif font-bold text-sm text-brand-charcoal">Fresh Daily Batches</h3>
-              <p className="text-xs text-stone-600 leading-relaxed">
+              <p className="text-xs text-brand-muted leading-relaxed">
                 Slow-simmered daily in morning batches to ensure optimal taste and extended shelf-life.
               </p>
             </div>
@@ -886,7 +886,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
       {/* 7. CUSTOMER REVIEWS */}
       <section id="reviews" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <div className="inline-flex items-center gap-1 text-xs font-bold text-brand-gold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1 text-xs font-bold text-brand-gold uppercase tracking-wider font-serif">
             <Heart className="w-3.5 h-3.5 fill-brand-gold text-brand-gold" />
             <span>Customer Testimonials</span>
           </div>
@@ -924,30 +924,30 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
           ].map((rev, idx) => (
             <div
               key={idx}
-              className="bg-[#FFFDF9] rounded-2xl border border-brand-border p-6 shadow-soft space-y-3 flex flex-col justify-between"
+              className="bg-white rounded-2xl border border-brand-border p-6 shadow-soft space-y-3 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex text-amber-500">
                     {[...Array(rev.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current" />
+                      <Star key={i} className="w-4 h-4 fill-current text-brand-gold" />
                     ))}
                   </div>
-                  <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-bold">
+                  <span className="inline-flex items-center gap-1 text-[10px] text-[#2E8B57] bg-[#2E8B57]/10 px-2 py-0.5 rounded-full font-bold">
                     <CheckCircle2 className="w-3 h-3" />
                     Verified Order
                   </span>
                 </div>
                 <h4 className="font-serif font-bold text-sm text-brand-charcoal">{rev.title}</h4>
-                <p className="text-xs text-stone-600 leading-relaxed mt-1">"{rev.comment}"</p>
+                <p className="text-xs text-brand-muted leading-relaxed mt-1">"{rev.comment}"</p>
               </div>
 
               <div className="pt-3 border-t border-brand-border/60 flex items-center justify-between text-xs">
                 <div>
                   <div className="font-bold text-brand-charcoal">{rev.name}</div>
-                  <div className="text-[10px] text-stone-500">{rev.city}</div>
+                  <div className="text-[10px] text-brand-muted">{rev.city}</div>
                 </div>
-                <span className="text-[10px] text-brand-gold-dark font-medium bg-brand-surface px-2 py-0.5 rounded">
+                <span className="text-[10px] text-brand-primary font-bold bg-brand-light-orange px-2 py-0.5 rounded">
                   {rev.product}
                 </span>
               </div>
@@ -964,15 +964,15 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
       {/* 8. AI ASSISTANT / RAG DISCOVERY SECTION */}
       {onOpenChatbot && (
         <section id="ai-assistant" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-stone-900 via-brand-maroon-dark to-black rounded-3xl p-8 sm:p-12 border-2 border-brand-gold/50 shadow-float text-[#FFFDF9] relative overflow-hidden">
+          <div className="bg-gradient-to-br from-[#241B18] via-[#3A2218] to-[#1C1412] rounded-3xl p-8 sm:p-12 border-2 border-brand-gold/60 shadow-float text-[#FFFFFF] relative overflow-hidden">
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
               <div className="lg:col-span-8 space-y-4">
-                <div className="inline-flex items-center gap-2 bg-brand-gold/20 text-brand-gold-light border border-brand-gold/40 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                  <Sparkles className="w-4 h-4 text-brand-gold" />
+                <div className="inline-flex items-center gap-2 bg-brand-primary/25 text-brand-gold-light border border-brand-gold/40 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider font-serif">
+                  <Sparkles className="w-4 h-4 text-brand-gold-light" />
                   <span>Interactive AI Sweet Connoisseur</span>
                 </div>
-                <h2 className="font-serif font-black text-3xl sm:text-4xl text-[#FFFDF9] leading-tight">
+                <h2 className="font-serif font-black text-3xl sm:text-4xl text-[#FFFFFF] leading-tight">
                   Need Help Choosing The Perfect Sweets?
                 </h2>
                 <p className="text-xs sm:text-sm text-stone-300 max-w-xl leading-relaxed">
@@ -1000,7 +1000,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
               <div className="lg:col-span-4 flex flex-col items-start lg:items-end justify-center">
                 <button
                   onClick={onOpenChatbot}
-                  className="flex items-center gap-2.5 bg-gradient-to-r from-brand-gold to-amber-500 hover:from-amber-500 hover:to-brand-gold text-stone-950 px-8 py-4 rounded-full font-black text-sm tracking-wide shadow-gold hover:scale-105 transition-all"
+                  className="flex items-center gap-2.5 bg-brand-primary hover:bg-brand-primary-hover text-white px-8 py-4 rounded-full font-black text-sm tracking-wide shadow-primary hover:scale-105 transition-all"
                 >
                   <Sparkles className="w-5 h-5 fill-current" />
                   <span>Launch AI Assistant</span>
@@ -1017,20 +1017,20 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
         <span className="text-brand-gold text-xs">❖</span>
       </div>
 
-      {/* 9. SPECIAL OFFERS SECTION */}
+      {/* 9. SPECIAL OFFERS SECTION (🟠 Light Orange #FFF0E6 Background Section) */}
       <section id="offers" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-brand-maroon via-brand-maroon-dark to-stone-900 rounded-3xl p-6 sm:p-10 border-2 border-brand-gold/50 shadow-float text-[#FFFDF9] relative overflow-hidden">
+        <div className="bg-brand-light-orange rounded-3xl p-6 sm:p-10 border-2 border-brand-primary/30 shadow-soft text-brand-charcoal relative overflow-hidden">
           <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-7 space-y-3">
-              <div className="inline-flex items-center gap-1.5 bg-brand-gold/20 text-brand-gold-light border border-brand-gold/40 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-1.5 bg-brand-primary text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider font-serif shadow-xs">
                 <Gift className="w-3.5 h-3.5" />
                 <span>Festive Celebration Promo</span>
               </div>
-              <h3 className="font-serif font-black text-2xl sm:text-4xl text-[#FFFDF9] leading-tight">
+              <h3 className="font-serif font-black text-2xl sm:text-4xl text-brand-charcoal leading-tight">
                 Use Coupon Codes For Instant Discounts!
               </h3>
-              <p className="text-xs sm:text-sm text-stone-300 max-w-xl">
-                Apply coupon code <code className="bg-black/50 px-2 py-0.5 rounded text-brand-gold-light font-mono font-bold">FESTIVE15</code> for 15% off orders over ₹999, or <code className="bg-black/50 px-2 py-0.5 rounded text-brand-gold-light font-mono font-bold">WELCOME10</code> for 10% off your first order.
+              <p className="text-xs sm:text-sm text-brand-muted max-w-xl leading-relaxed">
+                Apply coupon code <code className="bg-white px-2 py-0.5 rounded text-brand-primary font-mono font-bold border border-brand-primary/30">FESTIVE15</code> for 15% off orders over ₹999, or <code className="bg-white px-2 py-0.5 rounded text-brand-primary font-mono font-bold border border-brand-primary/30">WELCOME10</code> for 10% off your first order.
               </p>
             </div>
 
@@ -1040,14 +1040,14 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                 { code: 'KAJA50', title: '10% Off Gottam & Nethi Kaja', min: '₹499' },
                 { code: 'WELCOME10', title: '10% Welcome Discount', min: '₹300' },
               ].map((c) => (
-                <div key={c.code} className="bg-white/10 backdrop-blur-md border border-brand-gold/30 rounded-2xl p-3 flex items-center justify-between">
+                <div key={c.code} className="bg-white border border-brand-border rounded-2xl p-3 flex items-center justify-between shadow-xs">
                   <div>
-                    <span className="font-mono font-black text-xs text-brand-gold-light bg-black/40 px-2 py-0.5 rounded border border-brand-gold/40">
+                    <span className="font-mono font-black text-xs text-white bg-brand-primary px-2 py-0.5 rounded">
                       {c.code}
                     </span>
-                    <h4 className="font-serif font-bold text-xs text-[#FFFDF9] mt-0.5">{c.title}</h4>
+                    <h4 className="font-serif font-bold text-xs text-brand-charcoal mt-1">{c.title}</h4>
                   </div>
-                  <span className="text-[10px] text-stone-300">Min. {c.min}</span>
+                  <span className="text-[11px] text-brand-muted font-medium">Min. {c.min}</span>
                 </div>
               ))}
             </div>
@@ -1056,7 +1056,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
       </section>
 
       {/* 10. STORE LOCATIONS & INQUIRY FORM */}
-      <section id="contact" className="bg-heritage-warm py-16 border-t border-brand-gold/25">
+      <section id="contact" className="bg-heritage-warm py-16 border-t border-brand-border/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             
@@ -1069,40 +1069,40 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                 <h2 className="font-serif font-black text-2xl sm:text-3xl text-brand-charcoal">
                   Kotaiah Sweets Flagship Store
                 </h2>
-                <p className="text-xs text-stone-600 leading-relaxed">
+                <p className="text-xs text-brand-muted leading-relaxed">
                   Visit our historic Kakinada counter or order online for fast home delivery across all cities.
                 </p>
               </div>
 
-              <div className="bg-[#FFFDF9] rounded-3xl p-6 border border-brand-border shadow-soft space-y-3 text-xs text-stone-600">
+              <div className="bg-white rounded-3xl p-6 border border-brand-border shadow-soft space-y-3 text-xs text-brand-muted">
                 <p className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-brand-gold shrink-0 mt-0.5" />
+                  <MapPin className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
                   <span>Main Bazaar Road, Near Clock Tower, Kakinada, Andhra Pradesh - 533001</span>
                 </p>
                 <p className="flex items-center gap-2.5">
-                  <Phone className="w-4 h-4 text-brand-gold shrink-0" />
+                  <Phone className="w-4 h-4 text-brand-primary shrink-0" />
                   <span>+91 884 237 8999 / +91 94401 23456</span>
                 </p>
                 <p className="flex items-center gap-2.5">
-                  <Mail className="w-4 h-4 text-brand-gold shrink-0" />
+                  <Mail className="w-4 h-4 text-brand-primary shrink-0" />
                   <span>orders@kotaiahsweets.com</span>
                 </p>
                 <p className="flex items-center gap-2.5">
-                  <Clock className="w-4 h-4 text-brand-gold shrink-0" />
+                  <Clock className="w-4 h-4 text-brand-primary shrink-0" />
                   <span>Open Daily: 7:00 AM – 10:30 PM (Fresh morning batches at 8 AM)</span>
                 </p>
               </div>
             </div>
 
             {/* Quick Bulk Inquiry Form */}
-            <div className="lg:col-span-7 bg-[#FFFDF9] rounded-3xl p-8 border border-brand-border shadow-soft space-y-4">
+            <div className="lg:col-span-7 bg-white rounded-3xl p-8 border border-brand-border shadow-soft space-y-4">
               <h3 className="font-serif font-bold text-lg text-brand-charcoal">
                 Send Bulk Order Inquiry / Message
               </h3>
 
               {contactSubmitted ? (
-                <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-2xl text-center space-y-2 text-xs text-emerald-900">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
+                <div className="p-6 bg-[#2E8B57]/10 border border-[#2E8B57]/30 rounded-2xl text-center space-y-2 text-xs text-[#2E8B57]">
+                  <CheckCircle2 className="w-8 h-8 text-[#2E8B57] mx-auto" />
                   <h4 className="font-bold text-sm">Inquiry Received!</h4>
                   <p>Our store team will contact you regarding fresh batch packing.</p>
                 </div>
@@ -1115,7 +1115,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                       value={contactForm.name}
                       onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
                       placeholder="Your Full Name *"
-                      className="bg-brand-surface p-2.5 rounded-xl border border-brand-border focus:outline-none focus:border-brand-gold"
+                      className="bg-brand-bg p-2.5 rounded-xl border border-brand-border text-brand-charcoal focus:outline-none focus:border-brand-primary"
                     />
                     <input
                       type="tel"
@@ -1123,7 +1123,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                       value={contactForm.phone}
                       onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
                       placeholder="Your Phone Number *"
-                      className="bg-brand-surface p-2.5 rounded-xl border border-brand-border focus:outline-none focus:border-brand-gold"
+                      className="bg-brand-bg p-2.5 rounded-xl border border-brand-border text-brand-charcoal focus:outline-none focus:border-brand-primary"
                     />
                   </div>
 
@@ -1132,7 +1132,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                     value={contactForm.email}
                     onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
                     placeholder="Your Email Address"
-                    className="w-full bg-brand-surface p-2.5 rounded-xl border border-brand-border focus:outline-none focus:border-brand-gold"
+                    className="w-full bg-brand-bg p-2.5 rounded-xl border border-brand-border text-brand-charcoal focus:outline-none focus:border-brand-primary"
                   />
 
                   <textarea
@@ -1141,12 +1141,12 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                     value={contactForm.message}
                     onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
                     placeholder="Tell us about the sweets, varieties or bulk gift box quantities needed..."
-                    className="w-full bg-brand-surface p-2.5 rounded-xl border border-brand-border focus:outline-none focus:border-brand-gold"
+                    className="w-full bg-brand-bg p-2.5 rounded-xl border border-brand-border text-brand-charcoal focus:outline-none focus:border-brand-primary"
                   />
 
                   <button
                     type="submit"
-                    className="bg-gradient-to-r from-brand-maroon to-brand-maroon-dark text-brand-gold-light px-8 py-3 rounded-2xl font-bold text-xs shadow-soft hover:scale-[1.02] transition-all flex items-center gap-2"
+                    className="bg-brand-primary hover:bg-brand-primary-hover text-white px-8 py-3 rounded-2xl font-bold text-xs shadow-primary hover:scale-[1.02] transition-all flex items-center gap-2"
                   >
                     <Send className="w-4 h-4" />
                     <span>Submit Inquiry</span>
@@ -1162,19 +1162,19 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
       {/* QUICK VIEW & ORDER MODAL (ALL DETAILS IN ONE PLACE) */}
       {quickViewProduct && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-in fade-in">
-          <div className="bg-[#FFFDF9] rounded-3xl border-2 border-brand-gold/60 max-w-2xl w-full p-6 sm:p-8 shadow-float space-y-6 my-8 relative">
+          <div className="bg-white rounded-3xl border-2 border-brand-gold/60 max-w-2xl w-full p-6 sm:p-8 shadow-float space-y-6 my-8 relative">
             
             {/* Close Button */}
             <button
               onClick={() => setQuickViewProduct(null)}
-              className="absolute top-4 right-4 p-2 text-stone-400 hover:text-brand-charcoal bg-brand-surface rounded-full transition-colors"
+              className="absolute top-4 right-4 p-2 text-brand-muted hover:text-brand-charcoal bg-brand-light-orange rounded-full transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
               {/* Product Image */}
-              <div className="w-full h-56 sm:h-64 rounded-2xl overflow-hidden bg-brand-surface border border-brand-border">
+              <div className="w-full h-56 sm:h-64 rounded-2xl overflow-hidden bg-brand-light-orange border border-brand-border">
                 <img
                   src={getProductImageUrl(quickViewProduct)}
                   alt={quickViewProduct.name}
@@ -1198,33 +1198,33 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                 <div className="flex items-center gap-2 text-xs">
                   <div className="flex text-amber-500">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3 h-3 fill-current" />
+                      <Star key={i} className="w-3 h-3 fill-current text-brand-gold" />
                     ))}
                   </div>
-                  <span className="font-bold text-stone-700">
+                  <span className="font-bold text-brand-charcoal">
                     {Number(quickViewProduct.rating || 5).toFixed(1)}
                   </span>
-                  <span className="text-stone-400">({quickViewProduct.review_count || 100}+ reviews)</span>
+                  <span className="text-brand-muted">({quickViewProduct.review_count || 100}+ reviews)</span>
                 </div>
 
-                <p className="text-xs text-stone-600 leading-relaxed font-sans">
+                <p className="text-xs text-brand-muted leading-relaxed font-sans">
                   {quickViewProduct.description}
                 </p>
 
                 {/* Price Display */}
-                <div className="bg-brand-surface p-3 rounded-xl border border-brand-border flex items-baseline justify-between">
+                <div className="bg-brand-light-orange p-3 rounded-xl border border-brand-border flex items-baseline justify-between">
                   <div>
-                    <span className="text-xs text-stone-500 mr-1">Price:</span>
-                    <span className="font-serif font-black text-xl text-brand-maroon">
+                    <span className="text-xs text-brand-muted mr-1">Price:</span>
+                    <span className="font-serif font-black text-xl text-brand-primary">
                       ₹{calculateModalPrice(quickViewProduct.price, modalWeight) * modalQuantity}
                     </span>
                   </div>
-                  <span className="text-[11px] text-stone-500">for {modalWeight}</span>
+                  <span className="text-[11px] text-brand-muted">for {modalWeight}</span>
                 </div>
 
                 {/* Weight Selector */}
                 <div className="space-y-1.5 pt-1">
-                  <span className="text-[11px] font-bold text-stone-700 uppercase font-serif">
+                  <span className="text-[11px] font-bold text-brand-charcoal uppercase font-serif">
                     Pack Weight:
                   </span>
                   <div className="grid grid-cols-3 gap-1.5">
@@ -1235,8 +1235,8 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                         onClick={() => setModalWeight(w)}
                         className={`py-1 px-2 rounded-lg text-xs font-semibold border transition-all ${
                           modalWeight === w
-                            ? 'bg-brand-maroon text-brand-gold-light border-brand-maroon'
-                            : 'bg-brand-surface text-stone-600 border-brand-border hover:border-brand-gold'
+                            ? 'bg-brand-primary text-white border-brand-primary'
+                            : 'bg-brand-light-orange text-brand-muted border-brand-border hover:border-brand-primary hover:text-brand-primary'
                         }`}
                       >
                         {w}
@@ -1247,18 +1247,18 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
 
                 {/* Quantity */}
                 <div className="flex items-center gap-3 pt-1">
-                  <span className="text-xs font-bold text-stone-700">Qty:</span>
-                  <div className="flex items-center border border-brand-border rounded-lg bg-brand-surface">
+                  <span className="text-xs font-bold text-brand-charcoal">Qty:</span>
+                  <div className="flex items-center border border-brand-border rounded-lg bg-brand-light-orange">
                     <button
                       onClick={() => setModalQuantity(Math.max(1, modalQuantity - 1))}
-                      className="px-2.5 py-1 font-bold text-xs"
+                      className="px-2.5 py-1 font-bold text-xs text-brand-charcoal hover:text-brand-primary"
                     >
                       -
                     </button>
                     <span className="px-2 py-1 text-xs font-bold text-brand-charcoal">{modalQuantity}</span>
                     <button
                       onClick={() => setModalQuantity(modalQuantity + 1)}
-                      className="px-2.5 py-1 font-bold text-xs"
+                      className="px-2.5 py-1 font-bold text-xs text-brand-charcoal hover:text-brand-primary"
                     >
                       +
                     </button>
@@ -1268,7 +1268,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
             </div>
 
             {/* Detailed Tabs in Modal: Ingredients, Taste, Shelf Life, Storage */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-brand-surface p-4 rounded-2xl border border-brand-border text-xs text-stone-600">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-brand-light-orange p-4 rounded-2xl border border-brand-border text-xs text-brand-muted">
               <div>
                 <strong className="text-brand-charcoal block font-serif">Ingredients Used:</strong>
                 <span>{quickViewProduct.ingredients || 'Pure Desi Cow Ghee, Refined Flour, Sugar, Cardamom'}</span>
@@ -1293,8 +1293,8 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
                 onClick={handleModalAddToCart}
                 className={`flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold transition-all ${
                   modalAdded
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-brand-cream border-2 border-brand-gold text-brand-maroon hover:bg-brand-gold hover:text-white'
+                    ? 'bg-[#2E8B57] text-white'
+                    : 'bg-brand-light-orange border-2 border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white'
                 }`}
               >
                 {modalAdded ? <Check className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
@@ -1303,7 +1303,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenChatbot, onToast }) => {
 
               <button
                 onClick={handleModalBuyNow}
-                className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold bg-gradient-to-r from-brand-maroon to-brand-maroon-dark text-brand-gold-light hover:shadow-gold transition-all"
+                className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold bg-brand-primary hover:bg-brand-primary-hover text-white shadow-primary hover:scale-[1.02] transition-all"
               >
                 <span>Buy Now • Checkout</span>
                 <ArrowRight className="w-4 h-4" />

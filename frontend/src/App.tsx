@@ -37,7 +37,7 @@ export const App: React.FC = () => {
     <AuthProvider>
       <CartProvider>
         <WishlistProvider>
-          <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#1C1917]">
+          <div className="min-h-screen flex flex-col bg-brand-bg text-brand-charcoal">
             {/* Header / Navigation */}
             <Navbar onOpenChatbot={() => setChatbotOpen(true)} />
 
